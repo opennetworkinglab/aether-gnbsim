@@ -1,0 +1,70 @@
+---
+
+- name: delete hello-world container
+  community.docker.docker_container:
+    name: "hello-world"
+    state: absent
+  ignore_errors: yes
+  become: true
+
+- name: delete hello-world docker image
+  community.docker.docker_image:
+    name: "hello-world"
+    force_absent: true
+    state: absent
+  ignore_errors: yes
+  become: true
+
+- name: remove docker module for Python
+  pip:
+    name: docker
+    state: absent
+  ignore_errors: yes
+  become: true
+
+- name: remove docker-ce
+  apt:
+    name: docker-ce
+    state: absent
+  become: true
+
+- name: delete /usr/bin/docker*
+  shell: |
+    rm -f /usr/bin/docker*
+  become: true
+
+- name: update apt cache
+  apt:
+    update_cache: true
+  become: true
+
+- name: remove docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu focal stable
+    state: absent
+  become: true
+
+- name: remove docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: absent
+  ignore_errors: yes
+  become: true
+
+- name: remove required system packages
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - python3-pip
+      - virtualenv
+      - python3-setuptools
+    state: absent
+  become: true
+
+- name: update apt cache
+  apt:
+    update_cache: true
+  become: true

@@ -1,0 +1,9 @@
+---
+
+- name: install gnbsim/docker
+  include: roles/docker/tasks/install.yml
+  tags: install
+
+- name: uninstall gnbsim/docker
+  include: roles/docker/tasks/uninstall.yml
+  tags: uninstall
