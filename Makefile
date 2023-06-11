@@ -27,10 +27,22 @@ gnbsim-pingall:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/pingall.yml \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-#### e. Provision docker ####
+#### c. Provision docker ####
 gnbsim-docker-install:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/docker.yml --tags install \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 gnbsim-docker-uninstall:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/docker.yml --tags uninstall \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+
+#### d. Provision gnbsim ####
+gnbsim-gnbsim-install:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/gnbsim.yml --tags install \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+gnbsim-gnbsim-uninstall:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/gnbsim.yml --tags uninstall \
+		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
+
+gnbsim-gnbsim-start:
+	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/gnbsim.yml --tags start \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
