@@ -1,10 +1,18 @@
 ---
 
+# - name: set the policy for the FORWARD chain to DROP
+#   ansible.builtin.iptables:
+#     chain: FORWARD
+#     policy: ACCEPT
+#   when: inventory_hostname in groups['gnbsim_nodes']
+#   become: true
+
 # - name: get info on gnbsim containers
 #   community.docker.docker_container_info:
 #     name: "gnbsim-{{ item.key }}"
 #   with_dict: "{{ gnbsim.simulator.gnbsims }}"
 #   register: container_info
+#   when: inventory_hostname in groups['gnbsim_nodes']
 #   become: true
 
 - name: copy config files to gnbsim host
@@ -17,6 +25,7 @@
     container_port: "{{ gnbsim.simulator.gnb.n3_port.base + (item.key|int) }}"
     amf_ip: "{{ gnbsim.simulator.amf.ip }}"
   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+  when: inventory_hostname in groups['gnbsim_nodes']
 
 # - name: copy config files into gnbsim containers
 #   docker_container_copy_into:
@@ -24,26 +33,30 @@
 #     path: /tmp/gnbsim-{{ item.key }}.yaml
 #     container_path: /tmp/gnbsim.yaml
 #   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+#   when: inventory_hostname in groups['gnbsim_nodes']
 
 - name: copy config files into gnbsim containers
   shell: |
     docker cp /tmp/gnbsim-{{ item.key }}.yaml \
       {{ gnbsim.docker.container.prefix }}-{{ item.key }}://tmp/gnbsim.yaml
   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: configure a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
   shell: |
     ip route add 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
   ignore_errors: yes
-  become: true
-
-- name: async start gnbsims
-  community.docker.docker_container_exec:
-    container: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"
-    command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml"
-  async: 45
-  poll: 0
-  with_dict: "{{ gnbsim.simulator.gnbsims }}"
-  register: async_results
-  become: true
+  
+# - name: async start gnbsims
+#   community.docker.docker_container_exec:
+#     container: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"
+#     command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml"
+#   async: 45
+#   poll: 0
+#   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+#   register: async_results
+#   when: inventory_hostname in groups['gnbsim_nodes']
+#   become: true

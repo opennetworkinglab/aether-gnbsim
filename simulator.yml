@@ -1,7 +1,7 @@
 ---
 
 - name: provision simulator
-  hosts: all
+  hosts: gnbsim_nodes
   gather_facts: true
     
   vars_files:

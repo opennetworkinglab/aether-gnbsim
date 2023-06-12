@@ -11,6 +11,7 @@
   community.docker.docker_container:
     name: "{{ gnbsim.docker.container.prefix }}-{{ item }}"
     image: "{{ gnbsim.docker.container.image }}"
+    network_mode: host
     command: sleep 1d
     state: started
   with_sequence: count={{ gnbsim.docker.container.count }}
