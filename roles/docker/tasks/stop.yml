@@ -5,6 +5,7 @@
     name: "{{ gnbsim.docker.container.prefix }}-{{ item }}"
     state: absent
   with_sequence: count={{ gnbsim.docker.container.count }}
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: remove {{ gnbsim.docker.container.image }} image
@@ -12,4 +13,5 @@
     name: "{{ gnbsim.docker.container.image }}"
     state: absent
     force_absent: true
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true

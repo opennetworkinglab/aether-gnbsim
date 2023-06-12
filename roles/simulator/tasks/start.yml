@@ -1,19 +1,49 @@
 ---
 
-- name: copy config/* files to gnbsim dockers
-  template:
-    src: "{{ gnbsim.simulator.gnbsims[item].config_file }}"
-    dest: /tmp/gnbsim{{ item }}.conf
-  with_sequence: start=1 end={{ gnbsim.docker.container_count }} stride=1
-
-# - name: async start gnbsims
-#   community.docker.docker_container_exec:
-#     container: "{{ gnbsim.docker.container_prefix }}-{{ async_item }}"
-#     command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim"
-#   async: 45
-#   poll: 0
-#   loop: "{{ range(1, gnbsim.docker.container_count+1) }}"
-#   loop_control:
-#     loop_var: "async_item"
-#   register: async_results
+# - name: get info on gnbsim containers
+#   community.docker.docker_container_info:
+#     name: "gnbsim-{{ item.key }}"
+#   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+#   register: container_info
 #   become: true
+
+- name: copy config files to gnbsim host
+  template:
+    src: "{{ item.value.config_file }}"
+    dest: /tmp/gnbsim-{{ item.key }}.yaml
+  vars:
+    # container_ip: "{{ container_info.results[(item.key|int)-1].container.NetworkSettings.IPAddress }}"
+    container_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+    container_port: "{{ gnbsim.simulator.gnb.n3_port.base + (item.key|int) }}"
+    amf_ip: "{{ gnbsim.simulator.amf.ip }}"
+  with_dict: "{{ gnbsim.simulator.gnbsims }}"
+
+# - name: copy config files into gnbsim containers
+#   docker_container_copy_into:
+#     container: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"
+#     path: /tmp/gnbsim-{{ item.key }}.yaml
+#     container_path: /tmp/gnbsim.yaml
+#   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+
+- name: copy config files into gnbsim containers
+  shell: |
+    docker cp /tmp/gnbsim-{{ item.key }}.yaml \
+      {{ gnbsim.docker.container.prefix }}-{{ item.key }}://tmp/gnbsim.yaml
+  with_dict: "{{ gnbsim.simulator.gnbsims }}"
+  become: true
+
+- name: configure a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
+  shell: |
+    ip route add 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
+  ignore_errors: yes
+  become: true
+
+- name: async start gnbsims
+  community.docker.docker_container_exec:
+    container: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"
+    command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml"
+  async: 45
+  poll: 0
+  with_dict: "{{ gnbsim.simulator.gnbsims }}"
+  register: async_results
+  become: true

@@ -3,6 +3,7 @@
 - name: update apt cache
   apt:
     update_cache: true
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: install required system packages
@@ -16,40 +17,47 @@
       - virtualenv
       - python3-setuptools
     state: latest
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: add docker GPG apt Key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: add docker Repository
   apt_repository:
     repo: deb https://download.docker.com/linux/ubuntu focal stable
     state: present
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: update apt cache
   apt:
     update_cache: true
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: install docker-ce
   apt:
     name: docker-ce
     state: latest
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: install docker module for Python
   pip:
     name: docker
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: pull hello-world docker image
   community.docker.docker_image:
     name: "hello-world"
     source: pull
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
 - name: create hello-world container
@@ -58,4 +66,5 @@
     image: "hello-world"
     state: started
     auto_remove: true
+  when: inventory_hostname in groups['gnbsim_nodes']
   become: true

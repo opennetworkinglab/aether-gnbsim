@@ -1,13 +1,13 @@
 
 gnbsim:
-  docker:
-    container_image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b
-    container_prefix: gnbsim
-    container_count: 2
-
   simulator:
+    gnb:
+      n3_port:
+        base: 2150
+    amf:
+      ip: "172.16.248.6"
     gnbsims:
       - "1":
-          config_file: "config/gnbsim1.yaml"
+          config_file: "config/gnbsim-1.yaml"
       - "2":
-          config_file: "config/gnbsim2.yaml"
+          config_file: "config/gnbsim-2.yaml"

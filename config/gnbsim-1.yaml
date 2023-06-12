@@ -15,15 +15,15 @@ configuration:
   execInParallel: false #run all profiles in parallel
   httpServer: # Serves APIs to create/control profiles on the go
     enable: false
-    ipAddr: "{{ docker_ip }}"
+    ipAddr: "{{ container_ip }}"
     port: 8080
   gnbs: # pool of gNodeBs
     gnb1:
       n2IpAddr: # gNB N2 interface IP address used to connect to AMF 
       n2Port: 9487 # gNB N2 Port used to connect to AMF
-      n3IpAddr: "{{ docker_ip }}" # gNB N3 interface IP address used to connect to UPF. when singleInterface mode is false
+      n3IpAddr: "{{ container_ip }}" # gNB N3 interface IP address used to connect to UPF. when singleInterface mode is false
       #n3IpAddr: "POD_IP" # when gnb is deployed in singleInterface mode
-      n3Port: 2152 # gNB N3 Port used to connect to UPF
+      n3Port: {{ container_port }} # gNB N3 Port used to connect to UPF
       name: gnb1 # gNB name that uniquely identify a gNB within application
       globalRanId:
         plmnId:
@@ -46,7 +46,7 @@ configuration:
                 - sst: 2
       defaultAmf:
         hostName: amf # Host name of AMF
-        ipAddr: 172.16.248.6 # 172.16.220.36 # AMF IP address
+        ipAddr: "{{ amf_ip }}" # 172.16.220.36 # AMF IP address
         port: 38412 # AMF port
 
   customProfiles:
