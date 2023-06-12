@@ -1,1 +1,7 @@
   
+gnbsim:
+  docker:
+    container:
+      image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b
+      prefix: gnbsim
+      count: 2

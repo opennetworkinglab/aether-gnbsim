@@ -1,0 +1,19 @@
+---
+
+- name: copy config/* files to gnbsim dockers
+  template:
+    src: "{{ gnbsim.simulator.gnbsims[item].config_file }}"
+    dest: /tmp/gnbsim{{ item }}.conf
+  with_sequence: start=1 end={{ gnbsim.docker.container_count }} stride=1
+
+# - name: async start gnbsims
+#   community.docker.docker_container_exec:
+#     container: "{{ gnbsim.docker.container_prefix }}-{{ async_item }}"
+#     command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim"
+#   async: 45
+#   poll: 0
+#   loop: "{{ range(1, gnbsim.docker.container_count+1) }}"
+#   loop_control:
+#     loop_var: "async_item"
+#   register: async_results
+#   become: true

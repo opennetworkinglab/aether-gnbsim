@@ -1,0 +1,13 @@
+---
+
+- name: install gnbsim/simulator
+  include: roles/simulator/tasks/install.yml
+  tags: install
+
+- name: uninstall gnbsim/simulator
+  include: roles/simulator/tasks/uninstall.yml
+  tags: uninstall
+
+- name: start gnbsim/simulator
+  include: roles/simulator/tasks/start.yml
+  tags: start
