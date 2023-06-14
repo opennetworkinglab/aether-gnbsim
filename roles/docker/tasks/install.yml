@@ -68,3 +68,11 @@
     auto_remove: true
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
+
+# hack for docker to run as user
+- name: run docker without sudo (HACK)
+  shell:
+    cmd: |
+      chown {{ ansible_user }} /var/run/docker.sock
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true

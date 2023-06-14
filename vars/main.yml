@@ -4,16 +4,22 @@ gnbsim:
     container:
       image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b
       prefix: gnbsim
-      count: 5
+      count: 2
 
   simulator:
-    gnb:
-      n3_port:
-        base: 2150
+    # gnb:
+    #   n3_port:
+    #     base: 2150
     amf:
-      ip: "172.16.248.6"
+      ip: "172.16.60.103"
     gnbsims:
       - "1":
           config_file: "config/gnbsim-1.yaml"
       - "2":
           config_file: "config/gnbsim-2.yaml"
+
+  network:
+    data_iface: ens18
+    mcavlan_iface: access
+    macvlan_network_name: access-net
+

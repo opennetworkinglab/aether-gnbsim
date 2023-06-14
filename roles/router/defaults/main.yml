@@ -1,0 +1,5 @@
+gnbsim:
+  network:
+    data_iface: data
+    mcavlan_iface: access
+    macvlan_network_name: access-net
