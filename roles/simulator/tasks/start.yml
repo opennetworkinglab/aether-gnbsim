@@ -5,7 +5,7 @@
 #     chain: FORWARD
 #     policy: ACCEPT
 #   when: inventory_hostname in groups['gnbsim_nodes']
-#   become: tr
+#   become: true
 
 - set_fact:
     network_name: "{{ gnbsim.network.macvlan_network_name }}"
