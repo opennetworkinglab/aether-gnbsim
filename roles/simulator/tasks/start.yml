@@ -35,6 +35,7 @@
   vars:
     container_ip: "{{ container_info.results[(item.key|int)-1].container.NetworkSettings.Networks['access-net'].IPAddress}}"
     # container_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+    gNBValue: "{{ gnbsim.simulator.gnb.id.base + (item.key) }}"
 #    container_port: "{{ gnbsim.simulator.gnb.n3_port.base + (item.key|int) }}"
     amf_ip: "{{ gnbsim.simulator.amf.ip }}"
   with_dict: "{{ gnbsim.simulator.gnbsims }}"
@@ -56,13 +57,7 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: configure a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
-  shell: |
-    ip route add 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
-  when: inventory_hostname in groups['gnbsim_nodes']
-  become: true
-  ignore_errors: yes
-  
+
 # - name: async start gnbsims
 #   community.docker.docker_container_exec:
 #     container: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"

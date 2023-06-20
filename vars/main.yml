@@ -7,11 +7,11 @@ gnbsim:
       count: 2
 
   simulator:
-    # gnb:
-    #   n3_port:
-    #     base: 2150
+    gnb:
+      id:
+        base: "00010"
     amf:
-      ip: "172.16.60.103"
+      ip: "172.16.49.210"
     gnbsims:
       - "1":
           config_file: "config/gnbsim-1.yaml"

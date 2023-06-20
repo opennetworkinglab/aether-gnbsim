@@ -5,7 +5,13 @@
 - set_fact:
     systemd_network_dir: /etc/systemd/network
 
-#TODO: remoe docker network
+- name: remove a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
+  shell: |
+    ip route del 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+  # ignore_errors: yes
+
 - name: Remove all but selected list of containers
   docker_network:
     name: "{{ gnbsim.network.macvlan_network_name }}"

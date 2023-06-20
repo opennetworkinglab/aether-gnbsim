@@ -54,5 +54,5 @@ gnbsim-simulator-start:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/simulator.yml --tags start \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-gnbsim-simulator-setup-install:  gnbsim-docker-install  gnbsim-docker-router-install gnbsim-docker-start
+gnbsim-simulator-setup-install: gnbsim-docker-router-install gnbsim-docker-start gnbsim-simulator-start
 gnbsim-simulator-setup-uninstall:  gnbsim-docker-stop gnbsim-docker-router-uninstall
