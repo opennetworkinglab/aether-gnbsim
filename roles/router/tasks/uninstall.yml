@@ -5,12 +5,21 @@
 - set_fact:
     systemd_network_dir: /etc/systemd/network
 
+
+#TODO fix gnbsimNode1 to loop
+- name: configure a static route on core host for 172.20.0.0/24 via {{ hostvars["gnbsimNode1"]['ansible_default_ipv4']['address']}}
+  shell: |
+    ip route del 172.20.0.0/24 via {{  hostvars["gnbsimNode1"]['ansible_default_ipv4']['address'] }}
+  when: inventory_hostname in groups['aether_nodes']
+  become: true
+  ignore_errors: yes
+
 - name: remove a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
   shell: |
     ip route del 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
-  # ignore_errors: yes
+  ignore_errors: yes
 
 - name: Remove all but selected list of containers
   docker_network:

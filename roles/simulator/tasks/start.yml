@@ -61,10 +61,30 @@
 # - name: async start gnbsims
 #   community.docker.docker_container_exec:
 #     container: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"
-#     command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml"
+#     # command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml"
+#     command: /bin/bash -c "rm -rf /gnbsim/bin/*.log; 
+#         /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.conf > /tmp/5g-core/e2e/latency/gnbsim{{ gnbsim_pod_idx }}-{{ ansible_date_time.iso8601_basic_short }}.log;
+#         cp -f /home/gnbsim.conf ./gnbsim{{ gnbsim_pod_idx }}-{{ ansible_date_time.iso8601_basic_short }}.conf;"
+#         # echo '{{ platform | to_nice_yaml }}' > /tmp/5g-core/e2e/latency/gnbsim{{ gnbsim_pod_idx }}-{{ ansible_date_time.iso8601_basic_short }}.params
 #   async: 45
 #   poll: 0
 #   with_dict: "{{ gnbsim.simulator.gnbsims }}"
-#   register: async_results
+#   # register: async_results
 #   when: inventory_hostname in groups['gnbsim_nodes']
+
+# - name: check gnbsim status
+#   shell:
+#     cmd: ps aux | grep "\-\-cfg\ /tmp/gnbsim" | wc -l
+#   register: sync_result
+#   until: sync_result.stdout == '{{ nfs.gnbsim.pod_count + 3 }}'
+#   retries: 40
+#   delay: 10
+#   when: inventory_hostname in groups["kube_control_plane"]
+
+# - name: Force stop experiments
+#   shell:
+#     cmd: pkill -9 -f /home/gnbsim
 #   become: true
+#   ignore_errors: yes
+#   when: inventory_hostname in groups["kube_control_plane"]
+
