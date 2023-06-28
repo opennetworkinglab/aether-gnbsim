@@ -6,4 +6,4 @@ Name={{gnbsim.network.mcavlan_iface}}
 
 [Network]
 IPForward=yes
-Address=172.20.0.1/24
+Address={{gnbsim.network.subnet_prefix}}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.1/24

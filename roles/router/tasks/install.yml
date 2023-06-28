@@ -45,6 +45,8 @@
   template:
     src: roles/router/templates/10-gnbsim.netdev
     dest: "{{ systemd_network_dir }}/10-gnbsim.netdev"
+  vars:
+    subnet_index: "{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}"
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
@@ -106,8 +108,18 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
+- name: configure a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
+  shell: |
+    ip route add 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+  ignore_errors: yes
+
+
 - name: "create a docker interface with name {{gnbsim.network.macvlan_network_name}} on {{gnbsim.network.mcavlan_iface}} interface"
-  command: "docker network create -d macvlan --subnet=172.20.0.0/24 --gateway=172.20.0.1 -o parent={{gnbsim.network.mcavlan_iface}} {{gnbsim.network.macvlan_network_name}}"
+  command: "docker network create -d macvlan --subnet={{gnbsim.network.subnet_prefix}}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.0/24 \
+           --gateway={{gnbsim.network.subnet_prefix}}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.1 \
+           -o parent={{gnbsim.network.mcavlan_iface}} {{gnbsim.network.macvlan_network_name}}"
   when: inventory_hostname in groups['gnbsim_nodes']
 
 # TODO: use ansible to creat docker network as in above command docker is being used
@@ -117,23 +129,18 @@
 #     driver: "macvlan"
 #     driver_options:
 #       subnet: 172.20.0.0/24
-#       gateway: 172.20.0.1 
-      
-- name: configure a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
-  shell: |
-    ip route add 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
-  when: inventory_hostname in groups['gnbsim_nodes']
-  become: true
-  ignore_errors: yes
+#       gateway: 172.20.0.1     
   
 #TODO: add route on core nodes send packets back to gNbsim  : FIX HARD CODED coreNode1 make it loop
-- name: configure a static route on core host for 172.20.0.0/24 via {{ hostvars["gnbsimNode1"]['ansible_default_ipv4']['address']}}
+- name: configure a static route on core host for {{gnbsim.network.subnet_prefix}}.0.0/24 via {{ hostvars["gnbsimNode1"]['ansible_default_ipv4']['address']}}
   shell: |
-    ip route add 172.20.0.0/24 via {{  hostvars["gnbsimNode1"]['ansible_default_ipv4']['address'] }}
+     ip route add {{gnbsim.network.subnet_prefix}}.{{my_idx}}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
+  loop: "{{ groups['gnbsim_nodes'] }}"
+  loop_control:
+    index_var: my_idx
   when: inventory_hostname in groups['aether_nodes']
   become: true
-  ignore_errors: yes
-
-
-- pause:
-    seconds: 5
+  # ignore_errors: yes
+  
+# - pause:
+#     seconds: 5

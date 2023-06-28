@@ -7,9 +7,12 @@
 
 
 #TODO fix gnbsimNode1 to loop
-- name: configure a static route on core host for 172.20.0.0/24 via {{ hostvars["gnbsimNode1"]['ansible_default_ipv4']['address']}}
+- name: remove a static route on core host for 172.20.0.0/24 via {{ hostvars[item]['ansible_default_ipv4']['address']}}
   shell: |
-    ip route del 172.20.0.0/24 via {{  hostvars["gnbsimNode1"]['ansible_default_ipv4']['address'] }}
+    ip route del {{gnbsim.network.subnet_prefix}}.{{my_idx}}.0/24 via {{ hostvars[item]['ansible_default_ipv4']['address'] }}
+  loop: "{{ groups['gnbsim_nodes'] }}"
+  loop_control:
+    index_var: my_idx
   when: inventory_hostname in groups['aether_nodes']
   become: true
   ignore_errors: yes
@@ -25,6 +28,8 @@
   docker_network:
     name: "{{ gnbsim.network.macvlan_network_name }}"
     state: absent
+  ignore_errors: yes
+  when: inventory_hostname in groups['gnbsim_nodes']
 
 - name: "delete iptable rule: forward from {{ gnbsim.network.data_iface }} to {{gnbsim.network.mcavlan_iface}} "
   iptables:
