@@ -77,10 +77,10 @@ configuration:
       # - "name": "iteration2"
       #   "1": "REGISTRATION-PROCEDURE 1"
       #   "next": "iteration3"
-      #   "repeat": 10
+      #   "repeat": 100
       # - "name": "iteration3"
       #   "1": "UE-INITIATED-DEREGISTRATION-PROCEDURE 1"
-          #"next":  "quit" #default value quit. i.e. no further iteration to run
+          # "next":  "quit" #default value quit. i.e. no further iteration to run
       
       # PDU
       # - "name": "iteration1"
@@ -88,7 +88,7 @@ configuration:
       #   "next": "iteration2"
       # - "name": "iteration2"
       #   "1": "PDU-SESSION-ESTABLISHMENT-PROCEDURE 1"
-      #   "repeat": 10
+      #   "repeat": 100
       #   "next": "iteration3"
       # - "name": "iteration3"
       #   "1": "UE-INITIATED-DEREGISTRATION-PROCEDURE 1"
@@ -100,12 +100,12 @@ configuration:
         "2": "PDU-SESSION-ESTABLISHMENT-PROCEDURE 1"
         "next": "iteration2"
       - "name": "iteration2"
-        "1": "UE-TRIGGERED-SERVICE-REQUEST-PROCEDURE 0"
-        "repeat": 10
+        "1": "UE-TRIGGERED-SERVICE-REQUEST-PROCEDURE 1"
+        "repeat": 100
         "next": "iteration3"
       - "name": "iteration3"
         "1": "UE-INITIATED-DEREGISTRATION-PROCEDURE 1"
-      #   "next":  "quit" #default v
+        "next":  "quit" #default v
 
   profiles: # profile information
     - profileType: register # profile type
@@ -256,4 +256,4 @@ configuration:
         mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
 
 logger:
-  logLevel: trace # how detailed the log will be, values: trace, debug, info, warn, error, fatal, panic
+  logLevel: info # how detailed the log will be, values: trace, debug, info, warn, error, fatal, panic
