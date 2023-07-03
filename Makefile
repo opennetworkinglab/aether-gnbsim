@@ -56,5 +56,5 @@ gnbsim-simulator-start:
 
 
 # run gnbsim-docker-install before running setup
-gnbsim-simulator-setup-install: gnbsim-docker-router-install gnbsim-docker-start gnbsim-simulator-start
+gnbsim-simulator-setup-install: gnbsim-docker-router-install gnbsim-docker-start 
 gnbsim-simulator-setup-uninstall:  gnbsim-docker-stop gnbsim-docker-router-uninstall
