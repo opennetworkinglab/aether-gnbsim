@@ -3,8 +3,8 @@ gnbsim:
   docker:
     container:
       # image: jingqih/5gc-gnbsim:dev-1.1.2
-      # image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b #5gc-gnbsim:0.0.1-dev #
-      image: mbilals/5gc-gnbsim:1milisecdelay
+      image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b
+      # image: mbilals/5gc-gnbsim:1milisecdelay
       # image: mbilals/5gc-gnbsim:1secdelay
       
       prefix: gnbsim
@@ -15,9 +15,9 @@ gnbsim:
       id:
         base: "00010"
     amf:
-      ip: "172.16.41.103"
+      # ip: "172.16.41.103"
       # ip: "172.16.3.36"
-      # ip: "172.16.144.5"
+      ip: "172.16.144.5"
 
     ueid_base: 208930100007488
     ue_per_pod: 1
@@ -25,10 +25,8 @@ gnbsim:
     gnbsims:
       - "1":
           config_file: "config/gnbsim.template.yaml"
-          # config_file: "config/gnbsim-1.yaml"
-      # - "2":
-          # config_file: "config/gnbsim.template.yaml"
-          # config_file: "config/gnbsim-2.yaml"
+      - "2":
+          config_file: "config/gnbsim.template.yaml"
 
   network:
     data_iface: ens18
