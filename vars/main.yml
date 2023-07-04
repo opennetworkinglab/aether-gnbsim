@@ -8,7 +8,7 @@ gnbsim:
       # image: mbilals/5gc-gnbsim:1secdelay
       
       prefix: gnbsim
-      count: 2
+      count: 5
 
   simulator:
     gnb:
@@ -20,13 +20,13 @@ gnbsim:
       ip: "172.16.144.5"
 
     ueid_base: 208930100007488
-    ue_per_pod: 1
+    ue_per_pod: 150
 
     gnbsims:
       - "1":
           config_file: "config/gnbsim.template.yaml"
-      - "2":
-          config_file: "config/gnbsim.template.yaml"
+      # - "2":
+          # config_file: "config/gnbsim.template.yaml"
 
   network:
     data_iface: ens18

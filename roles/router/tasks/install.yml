@@ -41,7 +41,7 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: copy 10-gnbsim.netdev to {{ systemd_network_dir }}/10-gnbsim.netdev
+- name: "copy 10-gnbsim.netdev to {{ systemd_network_dir }}/10-gnbsim.netdev"
   template:
     src: roles/router/templates/10-gnbsim.netdev
     dest: "{{ systemd_network_dir }}/10-gnbsim.netdev"
@@ -50,7 +50,7 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: copy 20-gnbsim.network to {{ systemd_network_dir }}/20-gnbsim.network
+- name: "copy 20-gnbsim.network to {{ systemd_network_dir }}/20-gnbsim.network"
   template:
     src: roles/router/templates/20-gnbsim.network
     dest: "{{ systemd_network_dir }}/20-gnbsim.network"
@@ -63,14 +63,14 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: create {{ systemd_network_dir }}/{{ result.stdout }}.d
+- name: "create {{ systemd_network_dir }}/{{ result.stdout }}.d"
   file:
     path: "{{ systemd_network_dir }}/{{ result.stdout }}.d"
     state: directory
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: copy macvlan.conf to {{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan.conf
+- name: "copy macvlan.conf to {{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan.conf"
   template:
     src: roles/router/templates/macvlan.conf
     dest: "{{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan.conf"
