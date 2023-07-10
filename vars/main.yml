@@ -32,5 +32,5 @@ gnbsim:
   network:
     data_iface: ens18
     mcavlan_iface: gnbAccess
-    macvlan_network_name: access-net
+    macvlan_network_name: gnb-net
     subnet_prefix: "172.20"
