@@ -1,7 +1,6 @@
 ---
 
 - set_fact:
-    # network_name: "{{ 'bridge' if (gnbsim.SameMachineAsCore == true) else gnbsim.network.macvlan_network_name }}"
     network_name: "{{ gnbsim.network.macvlan_network_name }}"
 
 - name: pull {{ gnbsim.docker.container.image }} image
@@ -22,12 +21,3 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-
-# - name: Add a container to a network, leaving existing containers connected
-#   docker_network:
-#     name: "{{ gnbsim.network.macvlan_network_name }}"
-#     connected:
-#       - "gnbsim-{{ item.key }}"
-#     appends: yes
-#   with_dict: "{{ gnbsim.simulator.gnbsims }}"
-#   when: inventory_hostname in groups['gnbsim_nodes']

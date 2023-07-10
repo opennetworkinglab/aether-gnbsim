@@ -15,5 +15,3 @@ gnbsim:
           config_file: "config/gnbsim-1.yaml"
       - "2":
           config_file: "config/gnbsim-2.yaml"
-    
-

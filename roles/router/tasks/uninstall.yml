@@ -1,12 +1,8 @@
 ---
 
-# TODO: running on master node for now (fix to run on multiple nodes)
-
 - set_fact:
     systemd_network_dir: /etc/systemd/network
 
-
-#TODO fix gnbsimNode1 to loop
 - name: remove a static route on core host for 172.20.0.0/24 via {{ hostvars[item]['ansible_default_ipv4']['address']}}
   shell: |
     ip route del {{gnbsim.network.subnet_prefix}}.{{my_idx}}.0/24 via {{ hostvars[item]['ansible_default_ipv4']['address'] }}

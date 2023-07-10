@@ -129,7 +129,6 @@
 #       subnet: 172.20.0.0/24
 #       gateway: 172.20.0.1     
   
-#TODO: add route on core nodes send packets back to gNbsim  : FIX HARD CODED coreNode1 make it loop
 - name: configure a static route on core host for {{gnbsim.network.subnet_prefix}}.0.0/24 via groups['gnbsim_nodes']['ansible_default_ipv4']['address']
   shell: |
      ip route add {{gnbsim.network.subnet_prefix}}.{{my_idx}}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
