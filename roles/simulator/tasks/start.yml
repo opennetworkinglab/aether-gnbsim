@@ -8,7 +8,8 @@
 #   become: true
 
 - set_fact:
-    network_name: "{{ gnbsim.network.macvlan_network_name }}"
+    network_name: "{{ 'bridge' if (gnbsim.SameMachineAsCore == true) else gnbsim.network.macvlan_network_name }}"
+    # network_name: "{{ gnbsim.network.macvlan_network_name }}"
     pod_count: "{{ gnbsim.simulator.gnbsims |length }}"
     per_vm_ue: "{{gnbsim.simulator.ue_per_pod|int * gnbsim.simulator.gnbsims |length}}"
 
@@ -29,95 +30,96 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: start imsi
-  set_fact:
-    startImsis: "{{ startImsis | default([]) + [{
-       inventory_hostname + (item.key): (gnbsim.simulator.ueid_base|int + ((gnbsim.simulator.ue_per_pod * (item.key|int) 
-       + lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname)|int * per_vm_ue|int  )
-        | int))|string,
-      }]
-    }}"
-  with_dict: "{{ gnbsim.simulator.gnbsims}}"
-  when: inventory_hostname in groups['gnbsim_nodes']
-
-- debug:
-    msg: "{{ startImsis[item.key|int-1][inventory_hostname+ (item.key)] }}"
-  with_dict: "{{ gnbsim.simulator.gnbsims}}"
-  when: inventory_hostname in groups['gnbsim_nodes']
+# - name: start imsi
+#   set_fact:
+#     startImsis: "{{ startImsis | default([]) + [{
+#        inventory_hostname + (item.key): (gnbsim.simulator.ueid_base|int + ((gnbsim.simulator.ue_per_pod * (item.key|int) 
+#        + lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname)|int * per_vm_ue|int  )
+#         | int))|string,
+#       }]
+#     }}"
+#   with_dict: "{{ gnbsim.simulator.gnbsims}}"
+#   when: inventory_hostname in groups['gnbsim_nodes']
 
 # - debug:
-#     msg:
-#       var1: "{{ container_info.results[(item.key|int)-1].container.NetworkSettings.Networks['access-net'].IPAddress}}"
-#       # var2: "{{container_info.results[(item.key|int)-1].container.NetworkSettings.Networks['(network_name)'].IPAddress}}"
+#     msg: "{{ startImsis[item.key|int-1][inventory_hostname+ (item.key)] }}"
+#   with_dict: "{{ gnbsim.simulator.gnbsims}}"
+#   when: inventory_hostname in groups['gnbsim_nodes']
+
+- debug:
+    msg:
+      var2: "{{ network_name }}"
+      var1: "{{ container_info.results[(item.key|int)-1].container.NetworkSettings.Networks[network_name]}}"
+      var3: "{{container_info.results[(item.key|int)-1].container.NetworkSettings.Networks[network_name].IPAddress}}"
+  with_dict: "{{ gnbsim.simulator.gnbsims }}"
+  when: inventory_hostname in groups['gnbsim_nodes']
+
+# - name: Remove config file on host
+#   ansible.builtin.file:
+#     path: "/tmp/gnbsim-{{ item.key }}.yaml"
+#     state: absent
 #   with_dict: "{{ gnbsim.simulator.gnbsims }}"
 #   when: inventory_hostname in groups['gnbsim_nodes']
 
-- name: Remove config file on host
-  ansible.builtin.file:
-    path: "/tmp/gnbsim-{{ item.key }}.yaml"
-    state: absent
-  with_dict: "{{ gnbsim.simulator.gnbsims }}"
-  when: inventory_hostname in groups['gnbsim_nodes']
+# # #TODO: replace static network name 'access-net' with dynamic netwrok name for container ip and docker network
+# - name: copy config files to gnbsim host
+#   template:
+#     src: "{{ item.value.config_file }}"
+#     dest: /tmp/gnbsim-{{ item.key }}.yaml
+#   vars:
+#     container_ip: "{{ container_info.results[(item.key|int)-1].container.NetworkSettings.Networks['access-net'].IPAddress}}"
+#     hex_chars: '0123456789ABCDEF'
+#     gNBValue: "{{ query('community.general.random_string', override_all=hex_chars, length=6) | join }}"
+#     amf_ip: "{{ gnbsim.simulator.amf.ip }}"  
+#     ueCount: "{{gnbsim.simulator.ue_per_pod|int}}"
+#     startimsi: "{{startImsis[item.key|int-1][inventory_hostname+ (item.key)]}}"
+#       # container_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+#       # gNBValue: "{{ gnbsim.simulator.gnb.id.base + (item.key) }}"
+#       # container_port: "{{ gnbsim.simulator.gnb.n3_port.base + (item.key|int) }}"
+#   # delegate_to: localhost
+#   # serial: 1
+#   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+#   when: inventory_hostname in groups['gnbsim_nodes']
 
-# #TODO: replace static network name 'access-net' with dynamic netwrok name for container ip and docker network
-- name: copy config files to gnbsim host
-  template:
-    src: "{{ item.value.config_file }}"
-    dest: /tmp/gnbsim-{{ item.key }}.yaml
-  vars:
-    container_ip: "{{ container_info.results[(item.key|int)-1].container.NetworkSettings.Networks['access-net'].IPAddress}}"
-    hex_chars: '0123456789ABCDEF'
-    gNBValue: "{{ query('community.general.random_string', override_all=hex_chars, length=6) | join }}"
-    amf_ip: "{{ gnbsim.simulator.amf.ip }}"  
-    ueCount: "{{gnbsim.simulator.ue_per_pod|int}}"
-    startimsi: "{{startImsis[item.key|int-1][inventory_hostname+ (item.key)]}}"
-      # container_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-      # gNBValue: "{{ gnbsim.simulator.gnb.id.base + (item.key) }}"
-      # container_port: "{{ gnbsim.simulator.gnb.n3_port.base + (item.key|int) }}"
-  # delegate_to: localhost
-  # serial: 1
-  with_dict: "{{ gnbsim.simulator.gnbsims }}"
-  when: inventory_hostname in groups['gnbsim_nodes']
+# - name: copy config files into gnbsim containers
+#   shell: |
+#     docker cp /tmp/gnbsim-{{ item.key }}.yaml \
+#       {{ gnbsim.docker.container.prefix }}-{{ item.key }}://tmp/gnbsim.yaml
+#   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+#   when: inventory_hostname in groups['gnbsim_nodes']
+#   become: true
 
-- name: copy config files into gnbsim containers
-  shell: |
-    docker cp /tmp/gnbsim-{{ item.key }}.yaml \
-      {{ gnbsim.docker.container.prefix }}-{{ item.key }}://tmp/gnbsim.yaml
-  with_dict: "{{ gnbsim.simulator.gnbsims }}"
-  when: inventory_hostname in groups['gnbsim_nodes']
-  become: true
+# - name: async start gnbsims
+#   community.docker.docker_container_exec:
+#     container: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"
+#     # command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml"
+#     command: /bin/bash -c "rm -rf /gnbsim/bin/*.log; rm -f /gnbsim/bin/*.config;
+#         /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml 2&> gnbsim{{ item.key }}-{{ ansible_date_time.iso8601_basic_short }}.log;
+#         cp -f /tmp/gnbsim.yaml ./gnbsim{{ item.key }}-{{ ansible_date_time.iso8601_basic_short }}.config;"
+#         # echo '{{ platform | to_nice_yaml }}' > /tmp/5g-core/e2e/latency/gnbsim{{ gnbsim_pod_idx }}-{{ ansible_date_time.iso8601_basic_short }}.params
+#   async: 45
+#   poll: 0
+#   with_dict: "{{ gnbsim.simulator.gnbsims }}"
+#   when: inventory_hostname in groups['gnbsim_nodes']
 
-- name: async start gnbsims
-  community.docker.docker_container_exec:
-    container: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"
-    # command: /bin/bash -c "rm -rf /gnbsim/bin/*.log & /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml"
-    command: /bin/bash -c "rm -rf /gnbsim/bin/*.log; rm -f /gnbsim/bin/*.config;
-        /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml 2&> gnbsim{{ item.key }}-{{ ansible_date_time.iso8601_basic_short }}.log;
-        cp -f /tmp/gnbsim.yaml ./gnbsim{{ item.key }}-{{ ansible_date_time.iso8601_basic_short }}.config;"
-        # echo '{{ platform | to_nice_yaml }}' > /tmp/5g-core/e2e/latency/gnbsim{{ gnbsim_pod_idx }}-{{ ansible_date_time.iso8601_basic_short }}.params
-  async: 45
-  poll: 0
-  with_dict: "{{ gnbsim.simulator.gnbsims }}"
-  when: inventory_hostname in groups['gnbsim_nodes']
+# - pause:
+#     seconds: 1
 
-- pause:
-    seconds: 1
+# - name: check gnbsim status for pod cound {{pod_count}}
+#   shell:
+#     cmd: ps aux | grep "\-\-cfg\ /tmp/gnbsim" | wc -l
+#   register: sync_result
+#   until: sync_result.stdout == "0"
+#   retries: 40
+#   delay: 10
+#   when: inventory_hostname in groups['gnbsim_nodes']
 
-- name: check gnbsim status for pod cound {{pod_count}}
-  shell:
-    cmd: ps aux | grep "\-\-cfg\ /tmp/gnbsim" | wc -l
-  register: sync_result
-  until: sync_result.stdout == "0"
-  retries: 40
-  delay: 10
-  when: inventory_hostname in groups['gnbsim_nodes']
+# - debug:
+#     var: "sync_result.stdout"
 
-- debug:
-    var: "sync_result.stdout"
-
-- name: Force stop experiments
-  shell:
-    cmd: pkill -9 -f /gnbsim/bin/gnbsim
-  become: true
-  ignore_errors: yes
-  when: inventory_hostname in groups['gnbsim_nodes']
+# - name: Force stop experiments
+#   shell:
+#     cmd: pkill -9 -f /gnbsim/bin/gnbsim
+#   become: true
+#   ignore_errors: yes
+#   when: inventory_hostname in groups['gnbsim_nodes']
