@@ -5,12 +5,6 @@
 - set_fact:
     systemd_network_dir: /etc/systemd/network
 
-# - include_tasks: roles/router/tasks/DifferentMachine.yml
-#   when: gnbsim.SameMachineAsCore == true
-
-# - include_tasks: SameMachineAsCoreInstall.yml
-  # when: gnbsim.SameMachineAsCore == true
-
 - name: set net.ipv4.conf.all.arp_filter to 1
   ansible.posix.sysctl:
     name: net.ipv4.conf.all.arp_filter
@@ -63,7 +57,7 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: find {{ gnbsim.network.data_iface }}'s netplan network directory
+- name: find "{{ gnbsim.network.data_iface }}'s" netplan network directory
   shell: basename $(find /*/systemd/network -maxdepth 1 -not -type d -name '*{{ gnbsim.network.data_iface }}.network' -print)
   register: result
   when: inventory_hostname in groups['gnbsim_nodes']
@@ -121,7 +115,6 @@
   become: true
   ignore_errors: yes
 
-
 - name: "create a docker interface with name {{gnbsim.network.macvlan_network_name}} on {{gnbsim.network.mcavlan_iface}} interface"
   command: "docker network create -d macvlan --subnet={{gnbsim.network.subnet_prefix}}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.0/24 \
            --gateway={{gnbsim.network.subnet_prefix}}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.1 \
@@ -138,7 +131,7 @@
 #       gateway: 172.20.0.1     
   
 #TODO: add route on core nodes send packets back to gNbsim  : FIX HARD CODED coreNode1 make it loop
-- name: configure a static route on core host for {{gnbsim.network.subnet_prefix}}.0.0/24 via groups['gnbsim_nodes']['ansible_default_ipv4']['address']
+- name: "configure a static route on core host for {{gnbsim.network.subnet_prefix}}.0.0/24 via groups['gnbsim_nodes']['ansible_default_ipv4']['address']"
   shell: |
      ip route add {{gnbsim.network.subnet_prefix}}.{{my_idx}}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
   loop: "{{ groups['gnbsim_nodes'] }}"

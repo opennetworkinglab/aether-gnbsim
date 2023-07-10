@@ -4,3 +4,5 @@ gnbsim:
     mcavlan_iface: access
     macvlan_network_name: access-net
     subnet_prefix: "172.20"
+  
+  SameMachineAsCore: true
