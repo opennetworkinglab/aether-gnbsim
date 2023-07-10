@@ -13,14 +13,14 @@
   loop: "{{ groups['gnbsim_nodes'] }}"
   loop_control:
     index_var: my_idx
-  when: inventory_hostname in groups['aether_nodes']
+  when: inventory_hostname in groups['aether_nodes'] and gnbsim.SameMachineAsCore == false
   become: true
   ignore_errors: yes
 
 - name: remove a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
   shell: |
     ip route del 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when: inventory_hostname in groups['gnbsim_nodes'] and gnbsim.SameMachineAsCore == false
   become: true
   ignore_errors: yes
 
@@ -97,7 +97,7 @@
     value: '0'
     sysctl_set: true
     reload: true
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when: inventory_hostname in groups['gnbsim_nodes'] and gnbsim.SameMachineAsCore == false
   become: true
 
 - name: set net.ipv4.conf.all.arp_ignore to 0
@@ -106,7 +106,7 @@
     value: '0'
     sysctl_set: true
     reload: true
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when: inventory_hostname in groups['gnbsim_nodes'] and gnbsim.SameMachineAsCore == false
   become: true
 
 - name: set net.ipv4.conf.all.arp_announce to 0
@@ -115,7 +115,7 @@
     value: '0'
     sysctl_set: true
     reload: true
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when: inventory_hostname in groups['gnbsim_nodes'] and gnbsim.SameMachineAsCore == false
   become: true
 
 - name: set net.ipv4.conf.all.rp_filter to 2
@@ -124,7 +124,7 @@
     value: '2'
     sysctl_set: true
     reload: true
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when: inventory_hostname in groups['gnbsim_nodes'] and gnbsim.SameMachineAsCore == false
   become: true
 
 # - name: stop aether-ue-nat.service

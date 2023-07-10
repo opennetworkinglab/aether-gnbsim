@@ -21,7 +21,7 @@ gnbsim:
       ip: "172.16.201.66"
 
     ueid_base: 208930100007488
-    ue_per_pod: 150
+    ue_per_pod: 100
 
     gnbsims:
       - "1":

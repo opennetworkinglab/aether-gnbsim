@@ -1,15 +1,7 @@
 ---
 
-# TODO: running on master node for now (fix to run on multiple nodes)
-
 - set_fact:
     systemd_network_dir: /etc/systemd/network
-
-# - include_tasks: roles/router/tasks/DifferentMachine.yml
-#   when: gnbsim.SameMachineAsCore == true
-
-# - include_tasks: SameMachineAsCoreInstall.yml
-  # when: gnbsim.SameMachineAsCore == true
 
 - name: set net.ipv4.conf.all.arp_filter to 1
   ansible.posix.sysctl:
