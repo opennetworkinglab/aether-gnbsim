@@ -11,15 +11,6 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- debug:
-    msg:
-      var1: "{{ item.0 }}"
-      var2: "{{ item.1 }}"
-      # var3: "{{container_info}}"
-      var3: "{{container_info.results[(item.0|int)-1].container.NetworkSettings.Networks[network_macvlan_name].IPAddress}}"
-  with_indexed_items: "{{ gnbsim.servers[lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname)] }}"
-  when: inventory_hostname in groups['gnbsim_nodes']
-
 - name: Remove config file on host
   ansible.builtin.file:
     path: "/tmp/gnbsim-{{ (item.0|int)+1 }}.yaml"
