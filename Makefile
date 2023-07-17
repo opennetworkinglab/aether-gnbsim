@@ -10,24 +10,16 @@ export EXTRA_VARS ?= ""
 
 #### Start Ansible docker ####
 
-ansible:
+gnbsim-ansible:
 	export ANSIBLE_NAME=$(ANSIBLE_NAME); \
 	sh $(GNBSIM_ROOT_DIR)/scripts/ansible ssh-agent bash
 
-#### a. Private keys (for ssh and git) ####
-
-list-keys:
-	ssh-add -l
-
-# add-keys:
-# 	ssh-add <your key>
-
-#### b. Debugging ####
+#### a. Debugging ####
 gnbsim-pingall:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/pingall.yml \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-#### c. Provision docker ####
+#### b. Provision docker ####
 gnbsim-docker-install:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/docker.yml --tags install \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
@@ -49,7 +41,7 @@ gnbsim-docker-stop:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/docker.yml --tags stop \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-#### d. Provision gnbsim ####
+#### c. Provision gnbsim ####
 gnbsim-simulator-start:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/simulator.yml --tags start \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
