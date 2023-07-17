@@ -5,3 +5,11 @@ gnbsim:
       image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b
       prefix: gnbsim
       count: 2
+    network:
+      macvlan:
+        name: gnbnet
+
+  router:
+    mcavlan:
+      iface: gnbaccess
+      subnet_prefix: "172.20"

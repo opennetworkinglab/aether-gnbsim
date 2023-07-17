@@ -4,7 +4,6 @@ gnbsim:
     macvlan:
       iface: gnbaccess
       subnet_prefix: "172.20"
-    network_name: access-net
 
 core:
   upf:

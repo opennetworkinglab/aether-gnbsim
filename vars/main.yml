@@ -4,22 +4,23 @@ gnbsim:
       image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b      
       prefix: gnbsim
       count: 2
-
-  ueid_base: 208930100007488
-  ue_per_pod: 100
-
-  gnbsims:
-    - "1":
-        config_file: "config/gnbsim.template.yaml"
-    # - "2":
-        # config_file: "config/gnbsim.template.yaml"
+    network:
+      macvlan:
+        name: gnbnet
 
   router:
     data_iface: ens18
     macvlan:
       iface: gnbaccess
       subnet_prefix: "172.20"
-    network_name: access-net
+
+  servers:
+    0:
+      - "config/gnbsim-s1-p1.yaml"
+      - "config/gnbsim-s1-p2.yaml"
+    # 1:
+    #   - "config/gnbsim-s2-p1.yaml"
+    #   - "config/gnbsim-s2-p2.yaml"
 
 core:
   upf:

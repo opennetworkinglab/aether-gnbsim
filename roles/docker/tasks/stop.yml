@@ -8,6 +8,14 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
+- name: delete macvlan:{{ gnbsim.docker.network.macvlan.name }} network
+  community.docker.docker_network:
+    name: "{{ gnbsim.docker.network.macvlan.name }}"
+    state: absent
+    force: yes
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+
 - name: remove {{ gnbsim.docker.container.image }} image
   community.docker.docker_image:
     name: "{{ gnbsim.docker.container.image }}"
