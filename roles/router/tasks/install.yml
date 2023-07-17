@@ -39,24 +39,30 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "copy 10-gnbsim.netdev to {{ systemd_network_dir }}/10-gnbsim.netdev"
+- name: "copy 10-gnbsim-access.netdev to {{ systemd_network_dir }}/10-gnbsim.netdev"
   template:
-    src: roles/router/templates/10-gnbsim.netdev
-    dest: "{{ systemd_network_dir }}/10-gnbsim.netdev"
-  vars:
-    subnet_index: "{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}"
+    src: roles/router/templates/10-gnbsim-access.netdev
+    dest: "{{ systemd_network_dir }}/10-gnbsim-access.netdev"
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "copy 20-gnbsim.network to {{ systemd_network_dir }}/20-gnbsim.network"
+- name: "copy 20-gnbsim-access.network to {{ systemd_network_dir }}/20-gnbsim.network"
   template:
-    src: roles/router/templates/20-gnbsim.network
+    src: roles/router/templates/20-gnbsim-access.network
     dest: "{{ systemd_network_dir }}/20-gnbsim.network"
+  vars:
+    subnet_address: "{{ gnbsim.router.macvlan.subnet_prefix }}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.1/24"
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: find {{ gnbsim.network.data_iface }}'s netplan network directory
-  shell: basename $(find /*/systemd/network -maxdepth 1 -not -type d -name '*{{ gnbsim.network.data_iface }}.network' -print)
+- name: find {{ gnbsim.router.data_iface }}'s netplan network directory
+  shell: basename $(find /*/systemd/network -maxdepth 1 -not -type d -name '*{{ gnbsim.router.data_iface }}.network' -print)
+  register: result
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+
+- name: find {{ gnbsim.router.data_iface }}'s netplan network directory
+  shell: basename $(find /*/systemd/network -maxdepth 1 -not -type d -name '*{{ gnbsim.router.data_iface }}.network' -print)
   register: result
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
@@ -88,56 +94,37 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "add iptable rule: forward from {{ gnbsim.network.data_iface }} to {{gnbsim.network.mcavlan_iface}} "
+- name: "add iptable rule: forward from {{ gnbsim.router.data_iface }} to {{ gnbsim.router.macvlan.iface }}"
   iptables:
     chain: FORWARD
-    in_interface: "{{ gnbsim.network.data_iface }}"
-    out_interface: "{{ gnbsim.network.mcavlan_iface }}"
+    in_interface: "{{ gnbsim.router.data_iface }}"
+    out_interface: "{{ gnbsim.router.macvlan.iface }}"
     jump: ACCEPT
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "add iptable rule: forward from {{ gnbsim.network.mcavlan_iface }}  to {{ gnbsim.network.data_iface }}"
+- name: "add iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to {{ gnbsim.router.data_iface }}"
   iptables:
     chain: FORWARD
-    in_interface: "{{ gnbsim.network.mcavlan_iface }}" 
-    out_interface: "{{ gnbsim.network.data_iface }}"
+    in_interface: "{{ gnbsim.router.macvlan.iface }}"
+    out_interface: "{{ gnbsim.router.data_iface }}"
     jump: ACCEPT
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: configure a static route on gnbsim host for 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
+# TODO: use ansible's net_static_route module
+- name: configure static route for upf traffic on gnbsim node
   shell: |
-    ip route add 192.168.252.0/24 via {{ gnbsim.simulator.amf.ip }}
-  when: inventory_hostname in groups['gnbsim_nodes'] and gnbsim.SameMachineAsCore == false
+    ip route add {{ core.upf.ip_prefix }} via {{ gnbsim.core.amf.ip }}
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['aether_nodes'])
   become: true
   ignore_errors: yes
 
-
-- name: "create a docker interface with name {{gnbsim.network.macvlan_network_name}} on {{gnbsim.network.mcavlan_iface}} interface"
-  command: "docker network create -d macvlan --subnet={{gnbsim.network.subnet_prefix}}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.0/24 \
-           --gateway={{gnbsim.network.subnet_prefix}}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.1 \
-           -o parent={{gnbsim.network.mcavlan_iface}} {{gnbsim.network.macvlan_network_name}}"
-  when: inventory_hostname in groups['gnbsim_nodes']
-
-# TODO: use ansible to creat docker network as in above command docker is being used
-# name: Create a network with driver options
-#   docker_network:
-#     name: access-net
-#     driver: "macvlan"
-#     driver_options:
-#       subnet: 172.20.0.0/24
-#       gateway: 172.20.0.1     
-  
-- name: configure a static route on core host for {{gnbsim.network.subnet_prefix}}.0.0/24 via groups['gnbsim_nodes']['ansible_default_ipv4']['address']
+# TODO: use ansible's net_static_route module
+- name: configure static route for gnbsim traffic on aether node
   shell: |
-     ip route add {{gnbsim.network.subnet_prefix}}.{{my_idx}}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
-  loop: "{{ groups['gnbsim_nodes'] }}"
-  loop_control:
-    index_var: my_idx
-  when: inventory_hostname in groups['aether_nodes'] and gnbsim.SameMachineAsCore == false
+    ip route add {{ gnbsim.router.macvlan.subnet_prefix }}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', item) }}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
+  with_items: "{{ play_hosts | intersect(groups['gnbsim_nodes']) }}"
+  when: (inventory_hostname in groups['aether_nodes']) and (inventory_hostname not in groups['gnbsim_nodes'])
   become: true
-  # ignore_errors: yes
-  
-# - pause:
-#     seconds: 5
+  ignore_errors: yes

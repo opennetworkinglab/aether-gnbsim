@@ -7,7 +7,7 @@
 
 - name: get info on gnbsim containers
   community.docker.docker_container_info:
-    name: "gnbsim-{{ item.key }}"
+    name: "{{ gnbsim.docker.container.prefix }}-{{ item.key }}"
   with_dict: "{{ gnbsim.simulator.gnbsims }}"
   register: container_info
   when: inventory_hostname in groups['gnbsim_nodes']

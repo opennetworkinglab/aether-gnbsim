@@ -1,36 +1,29 @@
-
 gnbsim:
-  SameMachineAsCore: true
   docker:
     container:
-      # image: jingqih/5gc-gnbsim:dev-1.1.2
-      image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b
-      # image: mbilals/5gc-gnbsim:1milisecdelay
-      # image: mbilals/5gc-gnbsim:1secdelay
-      
+      image: omecproject/5gc-gnbsim:main-PR_88-cc0d21b      
       prefix: gnbsim
       count: 2
 
-  simulator:
-    gnb:
-      id:
-        base: "00010"
-    amf:
-      # ip: "172.16.41.103"
-      # ip: "172.16.3.36"
-      ip: "172.16.201.66"
+  ueid_base: 208930100007488
+  ue_per_pod: 100
 
-    ueid_base: 208930100007488
-    ue_per_pod: 100
+  gnbsims:
+    - "1":
+        config_file: "config/gnbsim.template.yaml"
+    # - "2":
+        # config_file: "config/gnbsim.template.yaml"
 
-    gnbsims:
-      - "1":
-          config_file: "config/gnbsim.template.yaml"
-      # - "2":
-          # config_file: "config/gnbsim.template.yaml"
-
-  network:
+  router:
     data_iface: ens18
-    mcavlan_iface: gnbAccess
-    macvlan_network_name: gnb-net
-    subnet_prefix: "172.20"
+    macvlan:
+      iface: gnbaccess
+      subnet_prefix: "172.20"
+    network_name: access-net
+
+core:
+  upf:
+    ip_prefix: "192.168.252.0/24"
+  amf:
+    ip: "172.16.248.6"  
+    
