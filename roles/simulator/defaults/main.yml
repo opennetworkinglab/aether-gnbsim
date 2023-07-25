@@ -1,17 +1,16 @@
-
 gnbsim:
-  simulator:
-    gnb:
-      id:         
-        base: "00010"
-    amf:
-      ip: "172.16.248.6"
+  docker:
+    network:
+      macvlan:
+        name: gnbnet
 
-    ueid_base: 208930100007487
-    ue_per_pod: 5
-
-    gnbsims:
-      - "1":
-          config_file: "config/gnbsim-1.yaml"
-      - "2":
-          config_file: "config/gnbsim-2.yaml"
+  servers:
+    0:
+      - "config/gnbsim-s1-p1.yaml"
+      - "config/gnbsim-s1-p2.yaml"
+    1:
+      - "config/gnbsim-s2-p1.yaml"
+      - "config/gnbsim-s2-p2.yaml"
+core:
+  amf:
+    ip: "172.16.248.6"

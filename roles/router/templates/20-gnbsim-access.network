@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [Match]
-Name={{ gnbsim.router.data_iface }}
+Name={{ gnbsim.router.macvlan.iface }}
 
 [Network]
 IPForward=yes
-MACVLAN={{ gnbsim.router.macvlan.iface }} 
+Address={{ subnet_address }}
