@@ -116,7 +116,7 @@
 - name: configure static route for upf traffic on gnbsim node
   shell: |
     ip route add {{ core.upf.ip_prefix }} via {{ core.amf.ip }}
-  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['aether_nodes'])
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['master_nodes'])
   become: true
   ignore_errors: yes
 
@@ -125,6 +125,6 @@
   shell: |
     ip route add {{ gnbsim.router.macvlan.subnet_prefix }}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', item) }}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
   with_items: "{{ play_hosts | intersect(groups['gnbsim_nodes']) }}"
-  when: (inventory_hostname in groups['aether_nodes']) and (inventory_hostname not in groups['gnbsim_nodes'])
+  when: (inventory_hostname in groups['master_nodes']) and (inventory_hostname not in groups['gnbsim_nodes'])
   become: true
   ignore_errors: yes

@@ -6,7 +6,7 @@
 - name: "remove a static route on gnbsim host for {{ core.upf.ip_prefix }} via {{ core.amf.ip }}"
   shell: |
     ip route del {{ core.upf.ip_prefix }} via {{ core.amf.ip }}
-  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['aether_nodes'])
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['master_nodes'])
   become: true
   ignore_errors: yes
 
@@ -14,7 +14,7 @@
   shell: |
     ip route del {{ gnbsim.router.macvlan.subnet_prefix }}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', item) }}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
   with_items: "{{ play_hosts | intersect(groups['gnbsim_nodes']) }}"
-  when: (inventory_hostname in groups['aether_nodes']) and (inventory_hostname not in groups['gnbsim_nodes'])
+  when: (inventory_hostname in groups['master_nodes']) and (inventory_hostname not in groups['gnbsim_nodes'])
   become: true
   ignore_errors: yes
 
@@ -91,7 +91,7 @@
     value: '0'
     sysctl_set: true
     reload: true
-  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['aether_nodes'])
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['master_nodes'])
   become: true
 
 - name: set net.ipv4.conf.all.arp_ignore to 0
@@ -100,7 +100,7 @@
     value: '0'
     sysctl_set: true
     reload: true
-  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['aether_nodes'])
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['master_nodes'])
   become: true
 
 - name: set net.ipv4.conf.all.arp_announce to 0
@@ -109,7 +109,7 @@
     value: '0'
     sysctl_set: true
     reload: true
-  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['aether_nodes'])
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['master_nodes'])
   become: true
 
 - name: set net.ipv4.conf.all.rp_filter to 2
@@ -118,7 +118,7 @@
     value: '2'
     sysctl_set: true
     reload: true
-  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['aether_nodes'])
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['master_nodes'])
   become: true
 
 - name: force systemd to reread configs
