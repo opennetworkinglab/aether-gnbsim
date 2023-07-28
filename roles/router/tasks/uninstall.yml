@@ -25,6 +25,16 @@
 #   ignore_errors: yes
 #   when: inventory_hostname in groups['gnbsim_nodes']
 
+- name: "remove iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to access"
+  iptables:
+    chain: FORWARD
+    in_interface: "{{ gnbsim.router.macvlan.iface }}"
+    out_interface: access
+    jump: ACCEPT
+    state: absent
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname in groups['master_nodes'])
+  become: true
+
 - name: "remove iptable rule: forward from {{ gnbsim.router.data_iface }} to {{ gnbsim.router.macvlan.iface }} "
   iptables:
     chain: FORWARD

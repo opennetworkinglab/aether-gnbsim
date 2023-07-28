@@ -112,6 +112,16 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
+- name: "add iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to access"
+  iptables:
+    chain: FORWARD
+    in_interface: "{{ gnbsim.router.macvlan.iface }}"
+    out_interface: access
+    jump: ACCEPT
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname in groups['master_nodes'])
+  become: true
+
+
 # TODO: use ansible's net_static_route module
 - name: configure static route for upf traffic on gnbsim node
   shell: |
