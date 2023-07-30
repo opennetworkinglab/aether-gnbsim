@@ -13,27 +13,32 @@
 - name: "remove a static route on core host for {{ gnbsim.router.macvlan.subnet_prefix }}.0.0/24 via {{ hostvars[item]['ansible_default_ipv4']['address'] }}"
   shell: |
     ip route del {{ gnbsim.router.macvlan.subnet_prefix }}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', item) }}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
-  with_items: "{{ play_hosts | intersect(groups['gnbsim_nodes']) }}"
-  when: (inventory_hostname in groups['master_nodes']) and (inventory_hostname not in groups['gnbsim_nodes'])
+  with_items: "{{ play_hosts | intersect(groups['gnbsim_nodes']) | difference(groups['master_nodes']) }}"
+  when: (inventory_hostname in groups['master_nodes'])
   become: true
   ignore_errors: yes
 
-# - name: Remove all but selected list of containers
-#   docker_network:
-#     name: "{{ gnbsim.router.macvlan_network_name }}"
-#     state: absent
-#   ignore_errors: yes
-#   when: inventory_hostname in groups['gnbsim_nodes']
+- name: "remove iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to access"
+  iptables:
+    chain: FORWARD
+    in_interface: "{{ core.upf.iface }}"
+    out_interface: "{{ gnbsim.router.macvlan.iface }}"
+    jump: ACCEPT
+    state: absent
+  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname in groups['master_nodes'])
+  become: true
+  ignore_errors: yes
 
 - name: "remove iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to access"
   iptables:
     chain: FORWARD
     in_interface: "{{ gnbsim.router.macvlan.iface }}"
-    out_interface: access
+    out_interface: "{{ core.upf.iface }}"
     jump: ACCEPT
     state: absent
   when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname in groups['master_nodes'])
   become: true
+  ignore_errors: yes
 
 - name: "remove iptable rule: forward from {{ gnbsim.router.data_iface }} to {{ gnbsim.router.macvlan.iface }} "
   iptables:

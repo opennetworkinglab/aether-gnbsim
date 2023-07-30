@@ -42,7 +42,7 @@
     command: /bin/bash -c "rm -rf /gnbsim/bin/*.log; rm -f /gnbsim/bin/*.config;
         /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml 2&> gnbsim{{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}.log;
         cp -f /tmp/gnbsim.yaml ./gnbsim{{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}.config;"
-  async: 45
+  async: 100
   poll: 0
   with_indexed_items: "{{ gnbsim.servers[lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname)] }}"
   when: inventory_hostname in groups['gnbsim_nodes']
@@ -57,7 +57,7 @@
   register: async_result
   until: async_result.stdout == "0"
   retries: 500
-  delay: 10
+  delay: 5
   when: inventory_hostname in groups['gnbsim_nodes']
 
 - debug:
