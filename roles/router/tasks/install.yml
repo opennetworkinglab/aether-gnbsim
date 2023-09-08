@@ -46,10 +46,10 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "copy 20-gnbsim-access.network to {{ systemd_network_dir }}/20-gnbsim.network"
+- name: "copy 20-gnbsim-access.network to {{ systemd_network_dir }}/20-gnbsim-access.network"
   template:
     src: roles/router/templates/20-gnbsim-access.network
-    dest: "{{ systemd_network_dir }}/20-gnbsim.network"
+    dest: "{{ systemd_network_dir }}/20-gnbsim-access.network"
   vars:
     subnet_address: "{{ gnbsim.router.macvlan.subnet_prefix }}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname) }}.1/24"
   when: inventory_hostname in groups['gnbsim_nodes']
