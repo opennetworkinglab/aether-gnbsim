@@ -111,7 +111,7 @@ configuration:
     execInParallel: false
     startImsi: 208930100007505
     ueCount: 4
-    defaultAs: "192.168.250.6"
+    defaultAs: "192.168.250.1"
     perUserTimeout: 100
     plmnId:
       mcc: 208
