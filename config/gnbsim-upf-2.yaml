@@ -110,7 +110,7 @@ configuration:
     gnbName: gnb1
     execInParallel: false
     startImsi: 208930100007505
-    ueCount: 4
+    ueCount: 5
     defaultAs: "192.168.250.1"
     perUserTimeout: 100
     plmnId:
