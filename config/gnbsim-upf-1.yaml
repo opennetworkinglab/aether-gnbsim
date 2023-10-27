@@ -39,8 +39,11 @@ configuration:
                 mcc: 208
                 mnc: 93
               taiSliceSupportList:
+                - sst: 1			# Slice/Service Type (uinteger: range 0~255)
+                  sd: 010203			# Slice Differentiator (3 bytes/hex)
+                - sst: 1
+                  sd: 000001
                 - sst: 2
-                  sd: 010205			# Slice Differentiator (3 bytes/hex)
       defaultAmf:
         hostName: amf				# Host name of AMF
         ipAddr: "{{ amf_ip }}"			# AMF IP address
@@ -93,8 +96,8 @@ configuration:
     enable: false
     gnbName: gnb1
     execInParallel: false
-    startImsi: 208930100007505
-    ueCount: 1
+    startImsi: 208930100007487
+    ueCount: 5
     defaultAs: "192.168.250.1"
     perUserTimeout: 100
     plmnId:
@@ -109,7 +112,7 @@ configuration:
     enable: true
     gnbName: gnb1
     execInParallel: false
-    startImsi: 208930100007505
+    startImsi: 208930100007487
     ueCount: 5
     defaultAs: "192.168.250.1"
     perUserTimeout: 100
