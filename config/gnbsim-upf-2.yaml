@@ -152,6 +152,7 @@ configuration:
     opc: "981d464c7c52eb6e5036234984ad0bcf"
     key: "5122250214c33e723a5dd523fc145fc0"
     sequenceNumber: "16f3b3f70fc2"
+    retransMsg: true
 
   - profileType: deregister         # UE Initiated De-registration
     profileName: profile5
