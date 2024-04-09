@@ -88,7 +88,7 @@
   become: true
 
 # TODO: fix this hack (make a proper cleanup service)
-- name: remove {{ gnbsim.router.macvlan.iface }} macvlan interface 
+- name: remove {{ gnbsim.router.macvlan.iface }} macvlan interface
   shell: |
     ip link del {{ gnbsim.router.macvlan.iface }} || true
   when: inventory_hostname in groups['gnbsim_nodes']

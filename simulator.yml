@@ -3,7 +3,7 @@
 - name: provision simulator
   hosts: gnbsim_nodes
   gather_facts: true
-    
+
   vars_files:
     - "vars/main.yml"
 
