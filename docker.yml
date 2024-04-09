@@ -3,7 +3,7 @@
 - name: provision docker
   hosts: gnbsim_nodes
   gather_facts: true
-    
+
   vars_files:
     - "vars/main.yml"
 

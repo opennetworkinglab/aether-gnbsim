@@ -29,7 +29,7 @@ configuration:
         plmnId:
           mcc: 208				# Mobile Country Code
           mnc: 93				# Mobile Network Code
-        gNbId: 
+        gNbId:
           bitLength: 24
           gNBValue: "001001"			# gNB id (3 bytes/hex: range 000000~FFFFFF)
       supportedTaList:
