@@ -36,7 +36,7 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: async start gnbsims
+- name: start gnbsim
   community.docker.docker_container_exec:
     container: "{{ gnbsim.docker.container.prefix }}-{{ (item.0|int)+1 }}"
     command: /bin/bash -c "rm -rf /gnbsim/bin/*.log; rm -f /gnbsim/bin/*.config;
@@ -51,7 +51,7 @@
 - pause:
     seconds: 1
 
-- name: async check gnbsims
+- name: loop until gnbsim completes
   shell: |
     ps aux | grep "\-\-cfg\ /tmp/gnbsim" | wc -l
   register: async_result
@@ -63,7 +63,7 @@
 - debug:
     var: "async_result.stdout"
 
-- name: force stop gnbsims
+- name: force stop gnbsim
   shell: |
     pkill -9 -f /gnbsim/bin/gnbsim
   become: true
