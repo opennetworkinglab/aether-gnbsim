@@ -6,13 +6,6 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: remove previous installations
-  shell:
-    cmd: |
-      for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-  when: inventory_hostname in groups['gnbsim_nodes']
-  become: true
-
 - name: install required system packages
   apt:
     pkg:
@@ -35,18 +28,13 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: Add Docker's official GPG key
-  apt_key:
+- name: Download Docker GPG key
+  get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
-    keyring: /etc/apt/keyrings/docker.asc
-    state: present
-  when: inventory_hostname in groups['gnbsim_nodes']
-  become: true
-
-- name: Ensure /etc/apt/keyrings/docker.asc has the correct permissions
-  file:
-    path: /etc/apt/keyrings/docker.asc
+    dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
+    owner: root
+    group: root
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
@@ -117,10 +105,10 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true 
 
-# # hack for docker to run as user
-# - name: run docker without sudo (HACK)
-#   shell:
-#     cmd: |
-#       chown {{ ansible_user }} /var/run/docker.sock
-#   when: inventory_hostname in groups['gnbsim_nodes']
-#   become: true
+# hack for docker to run as user
+- name: run docker without sudo (HACK)
+  shell:
+    cmd: |
+      chown {{ ansible_user }} /var/run/docker.sock
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
