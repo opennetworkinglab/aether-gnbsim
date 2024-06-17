@@ -1,5 +1,6 @@
 #### Variables ####
 
+
 export ROOT_DIR ?= $(PWD)
 export GNBSIM_ROOT_DIR ?= $(ROOT_DIR)
 
