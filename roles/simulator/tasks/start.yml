@@ -67,7 +67,7 @@
   when: inventory_hostname in groups['gnbsim_nodes']
 
 - debug:
-    var: "gNbsimPod.stdout_lines" 
+    var: gNbsimPod.stdout_lines
   when: inventory_hostname in groups['gnbsim_nodes']
 
 - name: force stop gnbsim
