@@ -56,12 +56,19 @@
     ps aux | grep "\-\-cfg\ /tmp/gnbsim" | wc -l
   register: async_result
   until: async_result.stdout == "0"
-  retries: 500
+  retries: 100
   delay: 5
   when: inventory_hostname in groups['gnbsim_nodes']
 
+- name: show outupt of summary.log from gnbsim Pod
+  shell: |
+    docker exec gnbsim-1 cat summary.log
+  register: gNbsimPod
+  when: inventory_hostname in groups['gnbsim_nodes']
+
 - debug:
-    var: "async_result.stdout"
+    var: gNbsimPod.stdout_lines
+  when: inventory_hostname in groups['gnbsim_nodes']
 
 - name: force stop gnbsim
   shell: |
