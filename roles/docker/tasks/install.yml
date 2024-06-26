@@ -114,12 +114,6 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-# Need to restart machine to have permanent effect
-- name: Activate the new group membership (equivalent to newgrp docker)
-  command: newgrp docker
-  when: inventory_hostname in groups['gnbsim_nodes']
-  become: true
-
 # hack for docker to run as user
 - name: run docker without sudo (HACK)
   shell:
