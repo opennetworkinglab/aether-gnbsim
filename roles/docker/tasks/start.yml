@@ -27,7 +27,7 @@
     name: "{{ gnbsim.docker.container.prefix }}-{{ item }}"
     image: "{{ gnbsim.docker.container.image }}"
     network_mode: "{{ gnbsim.docker.network.macvlan.name }}"
-    command: sleep 1d
+    command: sleep infinity
     state: started
   with_sequence: count={{ gnbsim.docker.container.count }}
   when: inventory_hostname in groups['gnbsim_nodes']
