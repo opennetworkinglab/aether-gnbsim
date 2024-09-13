@@ -66,6 +66,12 @@
   register: gNbsimPod
   when: inventory_hostname in groups['gnbsim_nodes']
 
+- name: Check if simulation failed
+  set_fact:
+    status_fail: "{{ 'Status: FAIL' in gNbsimPod.stdout }}"
+
 - debug:
     msg: "{{ gNbsimPod.stdout_lines | regex_replace(' category=Summary component=GNBSIM','') }}"
-  when: inventory_hostname in groups['gnbsim_nodes'] and gNbsimPod.stdout_lines is defined
+  when: inventory_hostname in groups['gnbsim_nodes']
+  failed_when: status_fail
+  ignore_errors: yes
