@@ -69,10 +69,3 @@
 - debug:
     var: gNbsimPod.stdout_lines
   when: inventory_hostname in groups['gnbsim_nodes']
-
-- name: force stop gnbsim
-  shell: |
-    pkill -9 -f /gnbsim/bin/gnbsim
-  become: true
-  when: inventory_hostname in groups['gnbsim_nodes']
-  ignore_errors: yes
