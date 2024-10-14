@@ -71,7 +71,7 @@
     status_fail: "{{ 'Status: FAIL' in gNbsimPod.stdout }}"
 
 - debug:
-    msg: "{{ gNbsimPod.stdout_lines | regex_replace(' category=Summary component=GNBSIM','') }}"
+    msg: "{{ gNbsimPod.stdout_lines | map('regex_replace', '^([^\t]*\t){3}([^\t]*)\t.*$', '\\2') | list }}"
   when: inventory_hostname in groups['gnbsim_nodes']
   failed_when: status_fail
   ignore_errors: yes

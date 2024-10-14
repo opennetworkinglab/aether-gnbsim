@@ -43,7 +43,7 @@ gnbsim-docker-stop:
 
 #### c. Provision gnbsim ####
 gnbsim-simulator-run:
-	ANSIBLE_STDOUT_CALLBACK=yaml ansible-playbook -i $(HOSTS_INI_FILE) \
+	ansible-playbook -i $(HOSTS_INI_FILE) \
 		$(GNBSIM_ROOT_DIR)/simulator.yml --tags start --extra-vars \
 		"ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
