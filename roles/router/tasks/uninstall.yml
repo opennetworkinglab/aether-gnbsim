@@ -3,9 +3,9 @@
 - set_fact:
     systemd_network_dir: /etc/systemd/network
 
-- name: "remove a static route on gnbsim host for {{ core.upf.ip_prefix }} via {{ core.amf.ip }}"
+- name: "remove a static route on gnbsim host for {{ core.upf.access_subnet }} via {{ core.amf.ip }}"
   shell: |
-    ip route del {{ core.upf.ip_prefix }} via {{ core.amf.ip }}
+    ip route del {{ core.upf.access_subnet }} via {{ core.amf.ip }}
   when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['master_nodes'])
   become: true
   ignore_errors: yes
@@ -18,42 +18,42 @@
   become: true
   ignore_errors: yes
 
-- name: "remove iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to access"
+- name: "remove iptable rule: forward from access to gnbaccess"
   iptables:
     chain: FORWARD
-    in_interface: "{{ core.upf.iface }}"
-    out_interface: "{{ gnbsim.router.macvlan.iface }}"
+    in_interface: "access"
+    out_interface: "gnbaccess"
     jump: ACCEPT
     state: absent
   when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname in groups['master_nodes'])
   become: true
   ignore_errors: yes
 
-- name: "remove iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to access"
+- name: "remove iptable rule: forward from gnbaccess to access"
   iptables:
     chain: FORWARD
-    in_interface: "{{ gnbsim.router.macvlan.iface }}"
-    out_interface: "{{ core.upf.iface }}"
+    in_interface: "gnbaccess"
+    out_interface: "access"
     jump: ACCEPT
     state: absent
   when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname in groups['master_nodes'])
   become: true
   ignore_errors: yes
 
-- name: "remove iptable rule: forward from {{ gnbsim.router.data_iface }} to {{ gnbsim.router.macvlan.iface }} "
+- name: "remove iptable rule: forward from {{ gnbsim.router.data_iface }} to gnbaccess "
   iptables:
     chain: FORWARD
     in_interface: "{{ gnbsim.router.data_iface }}"
-    out_interface: "{{ gnbsim.router.macvlan.iface }}"
+    out_interface: "gnbaccess"
     jump: ACCEPT
     state: absent
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "delete iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to {{ gnbsim.router.data_iface }}"
+- name: "delete iptable rule: forward from gnbaccess to {{ gnbsim.router.data_iface }}"
   iptables:
     chain: FORWARD
-    in_interface: "{{ gnbsim.router.macvlan.iface }}"
+    in_interface: "gnbaccess"
     out_interface: "{{ gnbsim.router.data_iface }}"
     jump: ACCEPT
     state: absent
@@ -88,9 +88,9 @@
   become: true
 
 # TODO: fix this hack (make a proper cleanup service)
-- name: remove {{ gnbsim.router.macvlan.iface }} macvlan interface
+- name: remove gnbaccess macvlan interface
   shell: |
-    ip link del {{ gnbsim.router.macvlan.iface }} || true
+    ip link del gnbaccess || true
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
