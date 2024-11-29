@@ -230,4 +230,4 @@ configuration:
         mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
 
 logger:
-  logLevel: info # how detailed the log will be, values: trace, debug, info, warn, error, fatal, panic
+  logLevel: info # how detailed the log will be, values: debug, info, warn, error, fatal, panic
