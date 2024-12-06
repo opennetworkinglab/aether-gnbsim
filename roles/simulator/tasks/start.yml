@@ -40,8 +40,8 @@
 - name: start gnbsim
   community.docker.docker_container_exec:
     container: "{{ gnbsim.docker.container.prefix }}-{{ (item.0|int)+1 }}"
-    command: /bin/bash -c "rm -rf /gnbsim/bin/*.log; rm -f /gnbsim/bin/*.config;
-        /gnbsim/bin/gnbsim --cfg /tmp/gnbsim.yaml 2&> gnbsim{{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}.log;
+    command: /bin/bash -c "rm -rf *.log; rm -f *.config;
+        gnbsim --cfg /tmp/gnbsim.yaml 2&> gnbsim{{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}.log;
         cp -f /tmp/gnbsim.yaml ./gnbsim{{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}.config;"
   async: 100
   poll: 0

@@ -222,4 +222,4 @@ configuration:
 
 # Set logging level
 logger:
-  logLevel: info		# trace, debug, info, warn, error, fatal, panic
+  logLevel: info		# debug, info, warn, error, fatal, panic
