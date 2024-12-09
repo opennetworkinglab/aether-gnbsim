@@ -12,7 +12,7 @@
     name: "{{ gnbsim.docker.network.macvlan.name }}"
     driver: macvlan
     driver_options:
-      parent: "{{ gnbsim.router.macvlan.iface }}"
+      parent: gnbaccess
     ipam_config:
       - subnet: "{{ address_prefix }}.0/24"
         gateway: "{{ address_prefix }}.1"

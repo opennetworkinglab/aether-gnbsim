@@ -94,19 +94,19 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "add iptable rule: forward from {{ gnbsim.router.data_iface }} to {{ gnbsim.router.macvlan.iface }}"
+- name: "add iptable rule: forward from {{ gnbsim.router.data_iface }} to gnbaccess"
   iptables:
     chain: FORWARD
     in_interface: "{{ gnbsim.router.data_iface }}"
-    out_interface: "{{ gnbsim.router.macvlan.iface }}"
+    out_interface: gnbaccess
     jump: ACCEPT
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "add iptable rule: forward from {{ gnbsim.router.macvlan.iface }} to {{ gnbsim.router.data_iface }}"
+- name: "add iptable rule: forward from gnbaccess to {{ gnbsim.router.data_iface }}"
   iptables:
     chain: FORWARD
-    in_interface: "{{ gnbsim.router.macvlan.iface }}"
+    in_interface: gnbaccess
     out_interface: "{{ gnbsim.router.data_iface }}"
     jump: ACCEPT
   when: inventory_hostname in groups['gnbsim_nodes']
