@@ -11,5 +11,4 @@ gnbsim:
 
   router:
     mcavlan:
-      iface: gnbaccess
       subnet_prefix: "172.20"
