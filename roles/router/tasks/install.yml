@@ -132,7 +132,7 @@
 
 # TODO: use ansible's net_static_route module
 - set_fact:
-    subnet: "{{ core.upf.access_subnet | regex_replace('[0-9]/24', '0/24') }}"
+    subnet: "{{ core.upf.access_subnet | regex_replace('[0-9]+/24', '0/24') }}"
   when: inventory_hostname in groups['gnbsim_nodes']
 
 - name: configure static route for upf traffic on gnbsim node
