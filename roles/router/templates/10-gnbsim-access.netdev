@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [NetDev]
-Name={{ gnbsim.router.macvlan.iface }}
+Name=gnbaccess
 Kind=macvlan
 
 [MACVLAN]
