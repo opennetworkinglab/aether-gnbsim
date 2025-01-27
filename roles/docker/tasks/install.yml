@@ -77,9 +77,16 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: install docker module for Python
+- name: Create a virtual environment for Python
+  ansible.builtin.command:
+    cmd: python3 -m venv /opt/dockerenv
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+
+- name: Install docker module for Python in virtual environment
   pip:
     name: docker
+    virtualenv: /opt/dockerenv
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
