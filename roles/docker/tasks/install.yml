@@ -77,10 +77,20 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
+- set_fact:
+    UBUNTU_VERSION: "{{ ansible_distribution_version }}"
+  when: inventory_hostname in groups['gnbsim_nodes']
+
 - name: install docker module for Python
   pip:
     name: docker
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when: inventory_hostname in groups['gnbsim_nodes'] and UBUNTU_VERSION is version_compare('24.04', '<')
+  become: true
+
+- name: install python3-docker package
+  apt:
+    name: python3-docker
+  when: inventory_hostname in groups['gnbsim_nodes'] and UBUNTU_VERSION is version_compare('24.04', '>=')
   become: true
 
 - name: pull hello-world docker image
