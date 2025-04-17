@@ -74,10 +74,10 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "copy macvlan.conf to {{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan.conf"
+- name: "copy macvlan.conf to {{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan-gnbsim.conf"
   template:
     src: roles/router/templates/macvlan.conf
-    dest: "{{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan.conf"
+    dest: "{{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan-gnbsim.conf"
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
