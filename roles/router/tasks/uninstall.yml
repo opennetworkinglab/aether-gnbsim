@@ -76,6 +76,7 @@
     state: absent
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
+  ignore_errors: yes
 
 - name: delete {{ systemd_network_dir }}/20-gnbsim-access.network
   file:
