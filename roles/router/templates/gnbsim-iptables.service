@@ -8,7 +8,7 @@ Wants=sys-subsystem-net-devices-gnbaccess.device
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/iptables-restore -n /etc/iptables/gnbsim-rules.v4
+ExecStart=/bin/sh -c '/usr/sbin/iptables-restore -n < /etc/iptables/gnbsim-rules.v4'
 RemainAfterExit=yes
 
 [Install]
