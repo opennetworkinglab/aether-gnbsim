@@ -22,6 +22,38 @@
   become: true
   ignore_errors: yes
 
+- name: stop gnbsim-iptables.service
+  systemd:
+    name: gnbsim-iptables.service
+    state: stopped
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+  ignore_errors: yes
+
+- name: disable gnbsim-iptables.service
+  systemd:
+    name: gnbsim-iptables.service
+    enabled: false
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+  ignore_errors: yes
+
+- name: delete /etc/systemd/system/gnbsim-iptables.service
+  file:
+    path: /etc/systemd/system/gnbsim-iptables.service
+    state: absent
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+  ignore_errors: yes
+
+- name: delete persistent gnbsim iptables rules file
+  file:
+    path: /etc/iptables/gnbsim-rules.v4
+    state: absent
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+  ignore_errors: yes
+
 - name: "remove iptable rule: forward from access to gnbaccess"
   iptables:
     chain: FORWARD
