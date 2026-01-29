@@ -94,42 +94,6 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: "add iptable rule: forward from {{ gnbsim.router.data_iface }} to gnbaccess"
-  iptables:
-    chain: FORWARD
-    in_interface: "{{ gnbsim.router.data_iface }}"
-    out_interface: gnbaccess
-    jump: ACCEPT
-  when: inventory_hostname in groups['gnbsim_nodes']
-  become: true
-
-- name: "add iptable rule: forward from gnbaccess to {{ gnbsim.router.data_iface }}"
-  iptables:
-    chain: FORWARD
-    in_interface: gnbaccess
-    out_interface: "{{ gnbsim.router.data_iface }}"
-    jump: ACCEPT
-  when: inventory_hostname in groups['gnbsim_nodes']
-  become: true
-
-- name: "add iptable rule: forward from gnbaccess to access"
-  iptables:
-    chain: FORWARD
-    in_interface: gnbaccess
-    out_interface: access
-    jump: ACCEPT
-  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname in groups['master_nodes'])
-  become: true
-
-- name: "add iptable rule: forward from access to gnbaccess"
-  iptables:
-    chain: FORWARD
-    in_interface: access
-    out_interface: gnbaccess
-    jump: ACCEPT
-  when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname in groups['master_nodes'])
-  become: true
-
 # TODO: use ansible's net_static_route module
 - set_fact:
     subnet: "{{ core.upf.access_subnet | regex_replace('[0-9]+/24', '0/24') }}"
@@ -150,3 +114,54 @@
   when: (inventory_hostname in groups['master_nodes'])
   become: true
   ignore_errors: yes
+
+- name: install iptables-persistent package
+  apt:
+    name: iptables-persistent
+    state: present
+    update_cache: yes
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: create /etc/iptables directory
+  file:
+    path: /etc/iptables
+    state: directory
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+
+- name: deploy gnbsim iptables rules configuration
+  template:
+    src: roles/router/templates/gnbsim-iptables-rules.v4
+    dest: /etc/iptables/gnbsim-rules.v4
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+
+- name: copy gnbsim-iptables.service to /etc/systemd/system/gnbsim-iptables.service
+  template:
+    src: roles/router/templates/gnbsim-iptables.service
+    dest: /etc/systemd/system/gnbsim-iptables.service
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+
+- name: force systemd to reread configs
+  systemd:
+    daemon_reload: true
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+
+- name: enable gnbsim-iptables.service
+  systemd:
+    name: gnbsim-iptables.service
+    enabled: true
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
+
+- name: start gnbsim-iptables.service
+  systemd:
+    name: gnbsim-iptables.service
+    state: started
+  when: inventory_hostname in groups['gnbsim_nodes']
+  become: true
