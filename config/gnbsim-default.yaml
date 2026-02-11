@@ -144,6 +144,10 @@ configuration:
       plmnId:
         mcc: 208
         mnc: 93
+      dnn: "internet"
+      sNssai:
+        sst: 1
+        sd: "010203"
       opc: "981d464c7c52eb6e5036234984ad0bcf"
       key: "5122250214c33e723a5dd523fc145fc0"
       sequenceNumber: "16f3b3f70fc2"
@@ -158,6 +162,10 @@ configuration:
       plmnId:
         mcc: 208
         mnc: 93
+      dnn: "internet"
+      sNssai:
+        sst: 1
+        sd: "010203"
       defaultAs: "{{ ping_target }}"
       perUserTimeout: 100
       opc: "981d464c7c52eb6e5036234984ad0bcf"
@@ -177,6 +185,10 @@ configuration:
       plmnId:
         mcc: 208
         mnc: 93
+      dnn: "internet"
+      sNssai:
+        sst: 1
+        sd: "010203"
       opc: "981d464c7c52eb6e5036234984ad0bcf"
       key: "5122250214c33e723a5dd523fc145fc0"
       sequenceNumber: "16f3b3f70fc2"
@@ -193,6 +205,10 @@ configuration:
       plmnId:
         mcc: 208
         mnc: 93
+      dnn: "internet"
+      sNssai:
+        sst: 1
+        sd: "010203"
       opc: "981d464c7c52eb6e5036234984ad0bcf"
       key: "5122250214c33e723a5dd523fc145fc0"
       sequenceNumber: "16f3b3f70fc2"
@@ -207,6 +223,10 @@ configuration:
       plmnId:
         mcc: 208
         mnc: 93
+      dnn: "internet"
+      sNssai:
+        sst: 1
+        sd: "010203"
       defaultAs: "{{ ping_target }}"
       perUserTimeout: 100
       opc: "981d464c7c52eb6e5036234984ad0bcf"
@@ -223,6 +243,10 @@ configuration:
       plmnId:
         mcc: 208
         mnc: 93
+      dnn: "internet"
+      sNssai:
+        sst: 1
+        sd: "010203"
       defaultAs: "{{ ping_target }}"
       opc: "981d464c7c52eb6e5036234984ad0bcf"
       key: "5122250214c33e723a5dd523fc145fc0"
