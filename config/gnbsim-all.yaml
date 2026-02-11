@@ -11,59 +11,59 @@ info:
 
 configuration:
   runConfigProfilesAtStart: true
-  singleInterface: false			# Default value
-  execInParallel: false				# Run all profiles in parallel
-  httpServer:					# API to manage profiles at runtime
+  singleInterface: false      # Default value
+  execInParallel: false        # Run all profiles in parallel
+  httpServer:          # API to manage profiles at runtime
     enable: false
     ipAddr: "{{ container_ip }}"
     port: 8080
-  gnbs:						# Pool of gNBs
+  gnbs:            # Pool of gNBs
     gnb1:
-      n2IpAddr:					# N2 IPaddr to connect to AMF
-      n2Port: 9487				# N2 Port to connect to AMF
-      n3IpAddr: "{{ container_ip }}"		# N3 IPaddr to connect to UPF
-      #n3IpAddr: "POD_IP"			# Use when in singleInterface mode
-      n3Port: 2152 #{ { container_port } }	# N3 Port to connect to UPF
-      name: gnb1				# Uniquely identify gNB within application
+      n2IpAddr:          # N2 IPaddr to connect to AMF
+      n2Port: 9487        # N2 Port to connect to AMF
+      n3IpAddr: "{{ container_ip }}"    # N3 IPaddr to connect to UPF
+      #n3IpAddr: "POD_IP"      # Use when in singleInterface mode
+      n3Port: 2152 #{ { container_port } }  # N3 Port to connect to UPF
+      name: gnb1        # Uniquely identify gNB within application
       globalRanId:
         plmnId:
-          mcc: 208				# Mobile Country Code
-          mnc: 93				# Mobile Network Code
+          mcc: 208        # Mobile Country Code
+          mnc: 93        # Mobile Network Code
         gNbId:
           bitLength: 24
-          gNBValue: "001001"			# gNB id (3 bytes/hex: range 000000~FFFFFF)
+          gNBValue: "001001"      # gNB id (3 bytes/hex: range 000000~FFFFFF)
       supportedTaList:
-        - tac: 000001				# TAC (3 bytes/hex: range: 000000~FFFFFF)
+        - tac: 000001        # TAC (3 bytes/hex: range: 000000~FFFFFF)
           broadcastPlmnList:
             - plmnId:
                 mcc: 208
                 mnc: 93
               taiSliceSupportList:
-                - sst: 1			# Slice/Service Type (uinteger: range 0~255)
-                  sd: 010203			# Slice Differentiator (3 bytes/hex)
+                - sst: 1      # Slice/Service Type (uinteger: range 0~255)
+                  sd: 010203      # Slice Differentiator (3 bytes/hex)
                 - sst: 1
                   sd: 000001
                 - sst: 2
       defaultAmf:
-        hostName: amf				# Host name of AMF
-        ipAddr: "{{ amf_ip }}"			# AMF IP address
-        port: 38412				# AMF port
+        hostName: amf        # Host name of AMF
+        ipAddr: "{{ amf_ip }}"      # AMF IP address
+        port: 38412        # AMF port
 
 
   # Custom Profiles: Interate through combinations of supported Profiles
   # Disabled by default
   customProfiles:
     customProfiles1:
-      profileType: custom			# Profile type
-      profileName: custom1			# Uniqely identifies profile within application
-      enable: false				# True to execute the profile
-      execInParallel: true			# Run all subscribers in parallel
-      stepTrigger: false			# Wait for trigger to move to next step
-      gnbName: gnb1				# gNB used for this profile
-      startImsi: "208930100007487"		# First IMSI (used in sequence for each UE)
-      ueCount: 3				# Number of UEs
+      profileType: custom      # Profile type
+      profileName: custom1      # Uniqely identifies profile within application
+      enable: false        # True to execute the profile
+      execInParallel: true      # Run all subscribers in parallel
+      stepTrigger: false      # Wait for trigger to move to next step
+      gnbName: gnb1        # gNB used for this profile
+      startImsi: "208930100007487"    # First IMSI (used in sequence for each UE)
+      ueCount: 3        # Number of UEs
       perUserTimeout: 10
-      defaultAs: "{{ ping_target }}"		# Default ICMP destination (for UPF traffic)
+      defaultAs: "{{ ping_target }}"    # Default ICMP destination (for UPF traffic)
       opc: "981d464c7c52eb6e5036234984ad0bcf"
       key: "5122250214c33e723a5dd523fc145fc0"
       sequenceNumber: "16f3b3f70fc2"
@@ -91,7 +91,7 @@ configuration:
   # Profile 2 (pdusessest) typically enabled by default
 
   profiles:
-  - profileType: register	# UE Registration
+  - profileType: register  # UE Registration
     profileName: profile1
     enable: true
     gnbName: gnb1
@@ -222,4 +222,4 @@ configuration:
 
 # Set logging level
 logger:
-  logLevel: info		# debug, info, warn, error, fatal, panic
+  logLevel: info    # debug, info, warn, error, fatal, panic
