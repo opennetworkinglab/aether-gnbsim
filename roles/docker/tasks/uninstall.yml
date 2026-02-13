@@ -1,4 +1,8 @@
 ---
 
-
 #### TODO: Uninstall Docker
+
+- name: uninstall docker (not implemented)
+  debug:
+    msg: "Docker uninstall not yet implemented"
+  when: false
