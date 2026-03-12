@@ -1,9 +1,9 @@
-# SPDX-FileCopyrightText: 2026 Intel Corporation
+# Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 [Unit]
 Description=GNBSim iptables rules
-After=systemd-networkd.service
+After=systemd-networkd.service gnbsim-macvlan.service
 Wants=sys-subsystem-net-devices-gnbaccess.device
 
 [Service]

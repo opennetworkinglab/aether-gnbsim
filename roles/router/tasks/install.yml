@@ -55,29 +55,76 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: find {{ gnbsim.router.data_iface }}'s netplan network directory
-  shell: basename $(find /*/systemd/network -maxdepth 1 -not -type d -name '*{{ gnbsim.router.data_iface }}.network' -print)
-  register: result
+- name: find {{ gnbsim.router.data_iface }}'s systemd-networkd file by filename
+  shell: |
+    find /etc/systemd/network /run/systemd/network /lib/systemd/network /usr/lib/systemd/network \
+      -maxdepth 1 -type f -name '*{{ gnbsim.router.data_iface }}.network' -print 2>/dev/null \
+      | head -n 1 \
+      | xargs -r basename
+  register: data_iface_network_file_cmd
+  changed_when: false
+  failed_when: false
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: find {{ gnbsim.router.data_iface }}'s netplan network directory
-  shell: basename $(find /*/systemd/network -maxdepth 1 -not -type d -name '*{{ gnbsim.router.data_iface }}.network' -print)
-  register: result
-  when: inventory_hostname in groups['gnbsim_nodes']
+- name: find {{ gnbsim.router.data_iface }}'s active systemd-networkd file via networkctl
+  shell: |
+    networkctl status {{ gnbsim.router.data_iface }} 2>/dev/null \
+      | awk -F': ' '/Network File:/ && $2 ~ /\.network$/ {print $2; exit}' \
+      | xargs -r basename
+  register: data_iface_network_file_networkctl
+  changed_when: false
+  failed_when: false
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - (data_iface_network_file_cmd.stdout | trim) == ''
   become: true
 
-- name: "create {{ systemd_network_dir }}/{{ result.stdout }}.d"
+- name: set {{ gnbsim.router.data_iface }}'s systemd-networkd filename
+  set_fact:
+    data_iface_network_filename: >-
+      {{
+        (data_iface_network_file_cmd.stdout | trim)
+        if (data_iface_network_file_cmd.stdout | trim) != ''
+        else (data_iface_network_file_networkctl.stdout | default('') | trim)
+      }}
+  when: inventory_hostname in groups['gnbsim_nodes']
+
+- name: set whether {{ gnbsim.router.data_iface }} is managed by systemd-networkd
+  set_fact:
+    data_iface_networkd_managed: "{{ (data_iface_network_filename | default('') | trim) is match('.*\\.network$') }}"
+  when: inventory_hostname in groups['gnbsim_nodes']
+
+- name: note direct macvlan fallback for {{ gnbsim.router.data_iface }}
+  debug:
+    msg: >-
+      {{ gnbsim.router.data_iface }} is not managed by systemd-networkd. Falling back to direct macvlan interface setup.
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - not data_iface_networkd_managed
+
+- name: "create {{ systemd_network_dir }}/{{ data_iface_network_filename }}.d"
   file:
-    path: "{{ systemd_network_dir }}/{{ result.stdout }}.d"
+    path: "{{ systemd_network_dir }}/{{ data_iface_network_filename }}.d"
     state: directory
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - data_iface_networkd_managed
   become: true
 
-- name: "copy macvlan.conf to {{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan-gnbsim.conf"
+- name: "copy macvlan.conf to {{ systemd_network_dir }}/{{ data_iface_network_filename }}.d/macvlan-gnbsim.conf"
   template:
     src: roles/router/templates/macvlan.conf
-    dest: "{{ systemd_network_dir }}/{{ result.stdout }}.d/macvlan-gnbsim.conf"
+    dest: "{{ systemd_network_dir }}/{{ data_iface_network_filename }}.d/macvlan-gnbsim.conf"
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - data_iface_networkd_managed
+  become: true
+
+- name: copy gnbsim-macvlan.service to /etc/systemd/system/gnbsim-macvlan.service
+  template:
+    src: roles/router/templates/gnbsim-macvlan.service
+    dest: /etc/systemd/system/gnbsim-macvlan.service
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
@@ -87,11 +134,33 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
+- name: disable gnbsim-macvlan.service when systemd-networkd manages {{ gnbsim.router.data_iface }}
+  systemd:
+    name: gnbsim-macvlan.service
+    enabled: false
+    state: stopped
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - data_iface_networkd_managed
+  become: true
+
+- name: enable gnbsim-macvlan.service for direct macvlan fallback
+  systemd:
+    name: gnbsim-macvlan.service
+    enabled: true
+    state: started
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - not data_iface_networkd_managed
+  become: true
+
 - name: restart systemd-networkd
   systemd:
     name: systemd-networkd
     state: restarted
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - data_iface_networkd_managed
   become: true
 
 # TODO: use ansible's net_static_route module
