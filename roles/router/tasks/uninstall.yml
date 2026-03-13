@@ -146,7 +146,6 @@
   failed_when: false
   when:
     - inventory_hostname in groups['gnbsim_nodes']
-    - systemd_networkd_active
   become: true
   ignore_errors: yes
 
@@ -162,7 +161,6 @@
   failed_when: false
   when:
     - inventory_hostname in groups['gnbsim_nodes']
-    - systemd_networkd_active
     - (data_iface_network_file_networkctl.stdout | default('') | trim) == ''
   become: true
   ignore_errors: yes
@@ -175,7 +173,17 @@
         if (data_iface_network_file_networkctl.stdout | default('') | trim) != ''
         else (data_iface_network_file_cmd.stdout | default('') | trim)
       }}
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - systemd_networkd_active
+  ignore_errors: yes
+
+- name: set empty systemd-networkd filename when systemd-networkd is inactive
+  set_fact:
+    data_iface_network_filename: ''
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - not (systemd_networkd_active | default(false))
   ignore_errors: yes
 
 - name: delete {{ systemd_network_dir }}/{{ data_iface_network_filename }}.d/macvlan-gnbsim.conf

@@ -58,7 +58,7 @@
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
 
-- name: copy 10-gnbsim-access.netdev to {{ systemd_network_dir }}/10-gnbsim.netdev
+- name: copy 10-gnbsim-access.netdev to {{ systemd_network_dir }}/10-gnbsim-access.netdev
   template:
     src: roles/router/templates/10-gnbsim-access.netdev
     dest: "{{ systemd_network_dir }}/10-gnbsim-access.netdev"
@@ -124,7 +124,16 @@
         if (data_iface_network_file_networkctl.stdout | default('') | trim) != ''
         else (data_iface_network_file_cmd.stdout | default('') | trim)
       }}
-  when: inventory_hostname in groups['gnbsim_nodes']
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - systemd_networkd_active
+
+- name: set empty systemd-networkd filename when systemd-networkd is inactive
+  set_fact:
+    data_iface_network_filename: ''
+  when:
+    - inventory_hostname in groups['gnbsim_nodes']
+    - not (systemd_networkd_active | default(false))
 
 - name: set whether {{ gnbsim.router.data_iface }} is managed by systemd-networkd
   set_fact:
