@@ -27,17 +27,17 @@ gnbsim-docker-uninstall:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/docker.yml --tags uninstall \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-gnbsim-docker-router-install:
+gnbsim-router-install:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/router.yml --tags install \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-gnbsim-docker-router-uninstall:
+gnbsim-router-uninstall:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/router.yml --tags uninstall \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
-gnbsim-docker-start:
+gnbsim-container-start:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/docker.yml --tags start \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
-gnbsim-docker-stop:
+gnbsim-container-stop:
 	ansible-playbook -i $(HOSTS_INI_FILE) $(GNBSIM_ROOT_DIR)/docker.yml --tags stop \
 		--extra-vars "ROOT_DIR=$(ROOT_DIR)" --extra-vars $(EXTRA_VARS)
 
@@ -49,7 +49,7 @@ gnbsim-simulator-run:
 
 
 # run gnbsim-docker-install before running setup
-gnbsim-install: gnbsim-docker-install gnbsim-docker-router-install gnbsim-docker-start
-gnbsim-uninstall:  gnbsim-docker-stop gnbsim-docker-router-uninstall gnbsim-docker-uninstall
-gnbsim-reset: gnbsim-docker-stop gnbsim-docker-start
+gnbsim-install: gnbsim-docker-install gnbsim-router-install gnbsim-container-start
+gnbsim-uninstall:  gnbsim-container-stop gnbsim-router-uninstall gnbsim-docker-uninstall
+gnbsim-reset: gnbsim-container-stop gnbsim-container-start
 gnbsim-run: gnbsim-simulator-run

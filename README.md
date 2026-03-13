@@ -16,7 +16,7 @@ To install gnbsim, follow these steps:
    - Set "macvlan_iface" to the name of the macvlan interface to be created.
    - Set "macvlan_network_name" to the name of the Docker network to be created.
    - Set "subnet_prefix" to the first two bytes of the subnet, which should correspond to the "custome_ran_subnet" of 5g-core or the machine's subnet.
-3. Start the gNbsim Docker containers using `make gnbsim-docker-start`:
+3. Start the gNbsim Docker containers using `make gnbsim-container-start`:
    - Set the container "image" for gNbsim.
    - Set "prefix" to the desired name for the gNbsim containers.
    - Set "count" to the number of containers to be instantiated on each VM.
