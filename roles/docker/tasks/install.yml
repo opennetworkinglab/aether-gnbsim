@@ -10,20 +10,27 @@
   command: docker --version
   register: docker_version
   changed_when: false
+  failed_when: false
   when: docker_check.rc == 0
 
 - name: print docker version output
   debug:
     var: docker_version.stdout
-  when: docker_check.rc == 0
+  when:
+    - docker_check.rc == 0
+    - docker_version is defined
+    - docker_version.rc == 0
 
 - name: print docker installation status
   debug:
     msg: Docker is not installed on {{ inventory_hostname }}. Proceeding with Docker installation.
-  when: docker_check.rc != 0
+  when: docker_check.rc != 0 or (docker_version is defined and docker_version.rc != 0)
 
 - meta: end_play
-  when: docker_check.rc == 0
+  when:
+    - docker_check.rc == 0
+    - docker_version is defined
+    - docker_version.rc == 0
 
 - name: update apt cache
   apt:
