@@ -8,14 +8,14 @@
     subnet: "{{ core.upf.access_subnet | regex_replace('[0-9]+/24', '0/24') }}"
   when: inventory_hostname in groups['gnbsim_nodes']
 
-- name: "remove static route for upf traffic on gnbsim node
+- name: remove static route for upf traffic on gnbsim node
   shell: |
     ip route del {{ subnet }} via {{ core.amf.ip }}
   when: (inventory_hostname in groups['gnbsim_nodes']) and (inventory_hostname not in groups['master_nodes'])
   become: true
   ignore_errors: yes
 
-- name: remove a static route on core host for {{ gnbsim.router.macvlan.subnet_prefix }}.0.0/24 via {{ hostvars[item]['ansible_default_ipv4']['address'] }}"
+- name: remove a static route on core host for {{ gnbsim.router.macvlan.subnet_prefix }}.0.0/24 via {{ hostvars[item]['ansible_default_ipv4']['address'] }}
   shell: |
     ip route del {{ gnbsim.router.macvlan.subnet_prefix }}.{{ lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', item) }}.0/24 via {{  hostvars[item]['ansible_default_ipv4']['address'] }}
   with_items: "{{ play_hosts | intersect(groups['gnbsim_nodes']) | difference(groups['master_nodes']) }}"
@@ -116,7 +116,7 @@
   become: true
   ignore_errors: yes
 
-- name: "remove iptable rule: forward from {{ gnbsim.router.data_iface }} to gnbaccess "
+- name: "remove iptable rule: forward from {{ gnbsim.router.data_iface }} to gnbaccess"
   iptables:
     chain: FORWARD
     in_interface: "{{ gnbsim.router.data_iface }}"
