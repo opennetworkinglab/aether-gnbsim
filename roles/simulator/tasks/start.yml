@@ -40,11 +40,16 @@
 - name: start gnbsim
   community.docker.docker_container_exec:
     container: "{{ gnbsim.docker.container.prefix }}-{{ (item.0|int)+1 }}"
-    command: /bin/bash -c "rm -rf *.log; rm -f *.config;
-        gnbsim --cfg /tmp/gnbsim.yaml > /proc/1/fd/1 2> /proc/1/fd/2;
-        cp -f gnbsim.log ./gnbsim{{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}.log;
-        cp -f summary.log ./summary{{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}.log;
-        cp -f /tmp/gnbsim.yaml ./gnbsim{{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}.config;"
+    command: |
+      /bin/bash -o pipefail -c "
+      set -e
+      rm -rf *.log; rm -f *.config
+      gnbsim --cfg /tmp/gnbsim.yaml > /proc/1/fd/1 2> /proc/1/fd/2
+      run_suffix={{ (item.0|int)+1 }}-{{ ansible_date_time.iso8601_basic_short }}
+      cp -f gnbsim.log ./gnbsim${run_suffix}.log
+      cp -f summary.log ./summary${run_suffix}.log
+      cp -f /tmp/gnbsim.yaml ./gnbsim${run_suffix}.config
+      "
   async: 100
   poll: 0
   with_indexed_items: "{{ gnbsim.servers[lookup('ansible.utils.index_of', groups['gnbsim_nodes'], 'eq', inventory_hostname)] }}"
