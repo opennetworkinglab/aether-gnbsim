@@ -33,4 +33,3 @@
   with_sequence: count={{ gnbsim.docker.container.count }}
   when: inventory_hostname in groups['gnbsim_nodes']
   become: true
-
